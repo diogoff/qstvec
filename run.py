@@ -9,6 +9,7 @@ if len(sys.argv) < 2:
     exit()
 
 qc = QuantumCircuit.from_qasm_file(sys.argv[1])
+qc_size = qc.size()
 
 sv = SparseStatevector(qc.num_qubits)
 
@@ -39,8 +40,8 @@ for ci in qc.data:
     t2 = time.perf_counter()
 
     print()
-    print(f'{ci_num}/{qc.size()} | {ci_num/qc.size()*100:.1f}%')
+    print(f'{ci_num}/{qc_size} | {ci_num/qc_size*100:.1f}%')
     print(f'{name} | {' '.join(map(str, params))} | {' '.join(map(str, qargs))}')
     print(f'{bit} | {amp:.3e}')
     print(f'{n} terms | max {k} | {k//n}x')
-    print(f'{t2-t1:.1f} s/it | {(t2-t1)*(qc.size()-ci_num)/3600:.1f} hours')
+    print(f'{t2-t1:.1f} s/it | {(t2-t1)*(qc_size-ci_num)/3600:.1f} hours')
