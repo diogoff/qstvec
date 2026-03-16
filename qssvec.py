@@ -28,9 +28,7 @@ class SparseStatevector:
         alpha = self.data.values
 
         # Call optimized kernel
-        # ----------------------------------------------------------------
         new_basis, new_alpha = self._evolve_kernel(U, qargs, basis, alpha)
-        # ----------------------------------------------------------------
 
         # Build new series
         new = pd.Series(data=new_alpha, index=new_basis)
