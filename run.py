@@ -1,7 +1,6 @@
-import os
 import sys
 import time
-import psutil
+
 from qiskit import QuantumCircuit
 from qssvec import SparseStatevector
 
@@ -28,25 +27,20 @@ for ci in qc.data:
 
     sv = sv.evolve(ci.operation, qargs)
     
-    k = 2**20 # 2**28
+    k = 2**20
     sv = sv.truncate(k)
+    n = len(sv.data)
    
-    d = sv.to_dict()
-
-    bit, amp = max(d.items(), key=lambda x: abs(x[1])**2)
-
-    prob = abs(amp)**2
-
-    n_terms = len(sv.data)
-    mem_used = psutil.Process(os.getpid()).memory_info().rss / 1024**3
-    mem_avail = psutil.virtual_memory().available / 1024**3
+    mag = sv.data.abs()
+    idx = mag.idxmax()
+    bit = f'{idx:0{qc.num_qubits}b}'
+    amp = mag[idx]
 
     t2 = time.perf_counter()
 
     print()
     print(f'{ci_num}/{qc.size()} | {ci_num/qc.size()*100:.1f}%')
     print(f'{name} | {' '.join(map(str, params))} | {' '.join(map(str, qargs))}')
-    print(f'{bit} | {prob:.3e}')
-    print(f'{n_terms} terms | max {k} | {k//n_terms}x')
-    print(f'{mem_used:.1f} GB used | {mem_avail:.1f} GB available')
+    print(f'{bit} | {amp:.3e}')
+    print(f'{n} terms | max {k} | {k//n}x')
     print(f'{t2-t1:.1f} s/it | {(t2-t1)*(qc.size()-ci_num)/3600:.1f} hours')
