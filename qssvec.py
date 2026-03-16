@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 
-from numba import jit, prange
 from qiskit.quantum_info import Operator
 
 class SparseStatevector:
@@ -27,26 +26,7 @@ class SparseStatevector:
         basis = self.data.index.values
         alpha = self.data.values
 
-        # Call optimized kernel
-        new_basis, new_alpha = self._evolve_kernel(U, qargs, basis, alpha)
-
-        # Build new series
-        new = pd.Series(data=new_alpha, index=new_basis)
-        new = new.groupby(level=0).sum()
-
-        # Filter out zeros
-        new = new[new.abs() > 0.]
-
-        # Update and return
-        self.data = new
-        return self
-
-    @staticmethod
-    @jit(nopython=True,
-         parallel=True,
-         cache=True)
-    def _evolve_kernel(U, qargs, basis, alpha):
-        # Dimensions        
+        # Dimensions
         dim = U.shape[0]
         n = basis.shape[0]
 
@@ -61,12 +41,12 @@ class SparseStatevector:
         for q in qargs:
             basis_ref &= ~(1 << q)
 
-        # Preallocate arrays for the results
-        new_basis = np.empty(n * dim, dtype=basis.dtype)
-        new_alpha = np.empty(n * dim, dtype=alpha.dtype)
+        # Arrays for storing the results
+        new_basis = np.empty(dim * n, dtype=basis.dtype)
+        new_alpha = np.empty(dim * n, dtype=alpha.dtype)
 
         # Loop over rows of U
-        for row in prange(dim):
+        for row in range(dim):
             # Corresponding output basis
             basis_out = basis_ref.copy()
             for i, q in enumerate(qargs):
@@ -76,7 +56,7 @@ class SparseStatevector:
             # Contribution to the output basis
             alpha_out = U[row, col] * alpha
 
-            # Write position
+            # Write positions
             start = n * row
             end = start + n
 
@@ -84,8 +64,16 @@ class SparseStatevector:
             new_basis[start:end] = basis_out
             new_alpha[start:end] = alpha_out
 
-        # Return the flat arrays
-        return new_basis, new_alpha
+        # Build new series
+        new = pd.Series(data=new_alpha, index=new_basis)
+        new = new.groupby(level=0).sum()
+
+        # Filter out zeros
+        new = new[new.abs() > 0.]
+
+        # Update and return
+        self.data = new
+        return self
 
     def truncate(self, k, renorm=True):
         if 0 < k < len(self.data):
