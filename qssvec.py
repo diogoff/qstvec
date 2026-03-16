@@ -84,6 +84,7 @@ class SparseStatevector:
             new_basis[start:end] = basis_out
             new_alpha[start:end] = alpha_out
 
+        # Return the flat arrays
         return new_basis, new_alpha
 
     def truncate(self, k, renorm=True):
