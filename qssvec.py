@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from numba import jit
+from numba import jit, prange
 from qiskit.quantum_info import Operator
 
 class SparseStatevector:
@@ -42,7 +42,7 @@ class SparseStatevector:
         return self
 
     @staticmethod
-    @jit(nopython=True, cache=True)
+    @jit(nopython=True, parallel=True, cache=True)
     def _evolve_kernel(U, qargs, basis, alpha):
         # Dimensions        
         dim = U.shape[0]
@@ -60,12 +60,11 @@ class SparseStatevector:
             basis_ref &= ~(1 << q)
 
         # Preallocate arrays for the results
-        new_basis = np.empty(n*dim, dtype=basis.dtype)
-        new_alpha = np.empty(n*dim, dtype=alpha.dtype)
-        idx = 0
+        new_basis = np.empty(n * dim, dtype=basis.dtype)
+        new_alpha = np.empty(n * dim, dtype=alpha.dtype)
 
         # Loop over rows of U
-        for row in range(dim):
+        for row in prange(dim):
             # Corresponding output basis
             basis_out = basis_ref.copy()
             for i, q in enumerate(qargs):
@@ -75,10 +74,13 @@ class SparseStatevector:
             # Contribution to the output basis
             alpha_out = U[row, col] * alpha
 
+            # Write position
+            start = n * row
+            end = start + n
+
             # Collect the results
-            new_basis[idx:idx+n] = basis_out
-            new_alpha[idx:idx+n] = alpha_out
-            idx += n
+            new_basis[start:end] = basis_out
+            new_alpha[start:end] = alpha_out
 
         return new_basis, new_alpha
 
