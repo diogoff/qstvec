@@ -42,7 +42,9 @@ class SparseStatevector:
         return self
 
     @staticmethod
-    @jit(nopython=True, parallel=True, cache=True)
+    @jit(nopython=True,
+         parallel=True,
+         cache=True)
     def _evolve_kernel(U, qargs, basis, alpha):
         # Dimensions        
         dim = U.shape[0]
