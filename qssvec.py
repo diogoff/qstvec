@@ -75,14 +75,28 @@ class SparseStatevector:
         self.data = new
         return self
 
-    def truncate(self, k, renorm=True):
-        if 0 < k < len(self.data):
-            mag = self.data.abs().values
-            pos = np.argpartition(mag, -k)[-k:]
-            new = pd.Series(data=self.data.values[pos],
-                            index=self.data.index[pos])
-            if renorm:
-                norm = np.linalg.norm(new.values)
-                new /= norm
-            self.data = new
+    def truncate(self, p_frac=1., n_max=0):
+        basis = self.data.index.values
+        alpha = self.data.values
+
+        prob = np.abs(alpha)**2
+        sort = np.argsort(prob)[::-1]
+        prob = prob[sort]
+
+        basis = basis[sort]
+        alpha = alpha[sort]
+
+        if 0. < p_frac < 1.:
+            frac = np.cumsum(prob) / np.sum(prob)
+            n = np.searchsorted(frac, p_frac) + 1
+            basis = basis[:n]
+            alpha = alpha[:n]
+
+        if 0 < n_max < len(basis):
+            basis = basis[:n_max]
+            alpha = alpha[:n_max]
+
+        alpha /= np.linalg.norm(alpha)
+
+        self.data = pd.Series(data=alpha, index=basis)
         return self
