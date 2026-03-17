@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+from numba import jit, prange
 from qiskit.quantum_info import Operator
 
 class SparseStatevector:
@@ -19,84 +20,86 @@ class SparseStatevector:
         return out
 
     def evolve(self, operation, qargs):
-        # Unitary matrix for operation
         U = Operator(operation).data.astype(self.data.dtype)
 
-        # Bases and amplitudes
         basis = self.data.index.values
         alpha = self.data.values
 
-        # Dimensions
+        basis, alpha = self._evolve_kernel(U, qargs, basis, alpha)
+
+        new = pd.Series(data=alpha, index=basis)
+        new = new.groupby(level=0).sum()
+
+        new = new[new.abs() > 0.]
+
+        self.data = new
+        return self
+
+    @staticmethod
+    @jit(nopython=True, parallel=True, cache=True)
+    def _evolve_kernel(U, qargs, basis, alpha):
         dim = U.shape[0]
         n = basis.shape[0]
 
-        # Column of U to be used
         col = np.zeros_like(basis)
         for i, q in enumerate(qargs):
             bit = (basis >> q) & 1
             col |= (bit << i)
 
-        # Reference basis with zeroed bits
         basis_ref = basis.copy()
         for q in qargs:
             basis_ref &= ~(1 << q)
 
-        # Arrays for storing the results
-        new_basis = np.empty(dim * n, dtype=basis.dtype)
-        new_alpha = np.empty(dim * n, dtype=alpha.dtype)
+        basis_out = np.empty(dim * n, dtype=basis.dtype)
+        alpha_out = np.empty(dim * n, dtype=alpha.dtype)
 
-        # Loop over rows of U
-        for row in range(dim):
-            # Corresponding output basis
-            basis_out = basis_ref.copy()
-            for i, q in enumerate(qargs):
-                if row & (1 << i):
-                    basis_out |= (1 << q)
-
-            # Contribution to the output basis
-            alpha_out = U[row, col] * alpha
-
-            # Write positions
+        for row in prange(dim):
             start = n * row
             end = start + n
 
-            # Collect the results
-            new_basis[start:end] = basis_out
-            new_alpha[start:end] = alpha_out
+            basis_out[start:end] = basis_ref
+            for i, q in enumerate(qargs):
+                if row & (1 << i):
+                    basis_out[start:end] |= (1 << q)
 
-        # Build new series
-        new = pd.Series(data=new_alpha, index=new_basis)
-        new = new.groupby(level=0).sum()
-
-        # Filter out zeros
-        new = new[new.abs() > 0.]
-
-        # Update and return
-        self.data = new
-        return self
+            alpha_out[start:end] = U[row, col] * alpha
+        
+        return basis_out, alpha_out
 
     def truncate(self, p_frac=1., n_max=0):
         basis = self.data.index.values
         alpha = self.data.values
 
+        basis, alpha = self._truncate_kernel(basis, alpha, p_frac, n_max)
+
+        self.data = pd.Series(data=alpha, index=basis)
+        return self
+
+    @staticmethod
+    @jit(nopython=True, cache=True)
+    def _truncate_kernel(basis, alpha, p_frac, n_max):
         prob = np.abs(alpha)**2
         sort = np.argsort(prob)[::-1]
         prob = prob[sort]
 
         basis = basis[sort]
         alpha = alpha[sort]
+        renorm = False
 
         if 0. < p_frac < 1.:
             frac = np.cumsum(prob) / np.sum(prob)
             n = np.searchsorted(frac, p_frac) + 1
+
             basis = basis[:n]
             alpha = alpha[:n]
+            renorm = True
 
-        if 0 < n_max < len(basis):
+        if 0 < n_max < basis.shape[0]:
             basis = basis[:n_max]
             alpha = alpha[:n_max]
+            renorm = True
 
-        alpha /= np.linalg.norm(alpha)
+        if renorm:
+            alpha /= np.linalg.norm(alpha)
 
-        self.data = pd.Series(data=alpha, index=basis)
-        return self
+        return basis, alpha
