@@ -85,7 +85,8 @@ class SparseStatevector:
         if 0. < p_frac < 1.:
             prob = prob[idx]
             frac = np.cumsum(prob) / np.sum(prob)
-            idx = idx[frac <= p_frac]
+            n = np.searchsorted(frac, p_frac) + 1
+            idx = idx[:n]
 
         if 0 < n_max < len(idx):
             idx = idx[:n_max]
