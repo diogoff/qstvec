@@ -30,7 +30,7 @@ for ci in qc.data:
 
     sv = sv.evolve(ci.operation, qargs)
     
-    p_frac = 0.99
+    p_frac = 0.999
     sv = sv.truncate(p_frac)
     n = len(sv.data)
    
