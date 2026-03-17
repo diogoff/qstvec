@@ -14,13 +14,14 @@ class SparseStatevector:
 
     def to_dict(self):
         out = dict()
-        for basis, alpha in self.data.items():
+        for basis, alpha in self.data.sort_index().items():
             key = f'{basis:0{self.num_qubits}b}'
             out[key] = alpha
         return out
 
     def evolve(self, operation, qargs):
         U = Operator(operation).data.astype(self.data.dtype)
+        qargs = np.asarray(qargs, dtype=self.data.index.dtype)
 
         basis = self.data.index.values
         alpha = self.data.values
@@ -79,27 +80,20 @@ class SparseStatevector:
     @jit(nopython=True, cache=True)
     def _truncate_kernel(basis, alpha, p_frac, n_max):
         prob = np.abs(alpha)**2
-        sort = np.argsort(prob)[::-1]
-        prob = prob[sort]
-
-        basis = basis[sort]
-        alpha = alpha[sort]
-        renorm = False
+        idx = np.argsort(prob)[::-1]
 
         if 0. < p_frac < 1.:
+            prob = prob[idx]
             frac = np.cumsum(prob) / np.sum(prob)
-            n = np.searchsorted(frac, p_frac) + 1
+            idx = idx[frac <= p_frac]
 
-            basis = basis[:n]
-            alpha = alpha[:n]
-            renorm = True
+        if 0 < n_max < len(idx):
+            idx = idx[:n_max]
 
-        if 0 < n_max < basis.shape[0]:
-            basis = basis[:n_max]
-            alpha = alpha[:n_max]
-            renorm = True
-
-        if renorm:
+        if 0 < len(idx) < len(basis):
+            idx = np.sort(idx)
+            basis = basis[idx]
+            alpha = alpha[idx]
             alpha /= np.linalg.norm(alpha)
 
         return basis, alpha
