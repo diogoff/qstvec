@@ -1,7 +1,6 @@
+import numba
 import numpy as np
 import pandas as pd
-
-from numba import jit, prange
 from qiskit.quantum_info import Operator
 
 class SparseStatevector:
@@ -37,7 +36,7 @@ class SparseStatevector:
         return self
 
     @staticmethod
-    @jit(nopython=True, parallel=True, cache=True)
+    @numba.jit(nopython=True, parallel=True, cache=True)
     def _evolve_kernel(U, qargs, basis, alpha):
         dim = U.shape[0]
         n = basis.shape[0]
@@ -54,7 +53,7 @@ class SparseStatevector:
         basis_out = np.empty(dim * n, dtype=basis.dtype)
         alpha_out = np.empty(dim * n, dtype=alpha.dtype)
 
-        for row in prange(dim):
+        for row in numba.prange(dim):
             start = n * row
             end = start + n
 
@@ -77,7 +76,7 @@ class SparseStatevector:
         return self
 
     @staticmethod
-    @jit(nopython=True, cache=True)
+    @numba.jit(nopython=True, cache=True)
     def _truncate_kernel(basis, alpha, p_frac, n_max):
         prob = np.abs(alpha)**2
         idx = np.argsort(prob)[::-1]
