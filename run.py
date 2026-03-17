@@ -37,7 +37,7 @@ for ci in qc.data:
     mag = sv.data.abs()
     idx = mag.idxmax()
     bit = f'{idx:0{qc.num_qubits}b}'
-    amp = mag[idx]
+    mag = mag[idx]
 
     pid = psutil.Process(os.getpid())
     mem = pid.memory_info().rss / 1024**3
@@ -46,8 +46,8 @@ for ci in qc.data:
 
     print()
     print(f'{ci_num}/{qc_size} | {ci_num/qc_size*100.:.1f}%')
-    print(f'{name} | {' '.join(map(str, params))} | {' '.join(map(str, qargs))}')
-    print(f'{bit} | {amp:.3e}')
+    print(f'{name} | {' '.join(map(str, params))} | qubit {' '.join(map(str, qargs))}')
+    print(f'{bit} | mag {mag:.3e}')
     print(f'{n} terms | order 2^{int(math.ceil(math.log2(n)))} | mem {mem:.1f} GB')
     print(f'{t1-t0:.1f} s/it | {(t1-t0)*(qc_size-ci_num)/3600:.1f} hours')
 
