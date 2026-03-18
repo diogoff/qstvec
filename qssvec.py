@@ -1,12 +1,7 @@
-import numba
 import numpy as np
 import pandas as pd
-from qiskit.quantum_info import Operator
 
-# ---------------------------------------------------------------------------------
-# * Change output to stdout, to a single line, if possible
-# * Reassess whether some parts of the _evolve_kernel should be moved to the caller
-# ---------------------------------------------------------------------------------
+from qiskit.quantum_info import Operator
 
 class SparseStatevector:
 
@@ -24,15 +19,33 @@ class SparseStatevector:
         return out
 
     def evolve(self, operation, qargs):
-        U = Operator(operation).data.astype(self.data.dtype)
-        qargs = np.asarray(qargs, dtype=self.data.index.dtype)
-
         basis = self.data.index.values
         alpha = self.data.values
 
-        basis, alpha = self._evolve_kernel(U, qargs, basis, alpha)
+        U = Operator(operation).data.astype(alpha.dtype)
+        qargs = np.asarray(qargs)
+        qrange = np.arange(qargs.size)
 
-        new = pd.Series(data=alpha, index=basis)
+        dim = 2 ** qargs.size
+        assert U.shape == (dim, dim)
+
+        bits = (basis[:, np.newaxis] >> qargs[np.newaxis, :]) & 1
+        col = np.bitwise_or.reduce(bits << qrange, axis=1)
+        col = np.tile(col, dim)
+
+        row = np.arange(dim)
+        bits = (row[:, np.newaxis] >> qrange[np.newaxis, :]) & 1
+        bits = np.bitwise_or.reduce(bits << qargs, axis=1)
+
+        row = np.repeat(row, basis.size)
+        bits = np.repeat(bits, basis.size)
+
+        basis_out = basis & ~np.bitwise_or.reduce(1 << qargs)
+        basis_out = np.tile(basis_out, dim) | bits
+
+        alpha_out = U[row, col] * np.tile(alpha, dim)
+
+        new = pd.Series(data=alpha_out, index=basis_out)
         new = new.groupby(level=0).sum()
 
         new = new[new.abs() > 0.]
@@ -40,49 +53,10 @@ class SparseStatevector:
         self.data = new
         return self
 
-    @staticmethod
-    @numba.jit(nopython=True, parallel=True, cache=True)
-    def _evolve_kernel(U, qargs, basis, alpha):
-        dim = U.shape[0]
-        n = basis.shape[0]
-
-        col = np.zeros_like(basis)
-        for i, q in enumerate(qargs):
-            bit = (basis >> q) & 1
-            col |= (bit << i)
-
-        basis_ref = basis.copy()
-        for q in qargs:
-            basis_ref &= ~(1 << q)
-
-        basis_out = np.empty(dim * n, dtype=basis.dtype)
-        alpha_out = np.empty(dim * n, dtype=alpha.dtype)
-
-        for row in numba.prange(dim):
-            start = n * row
-            end = start + n
-
-            basis_out[start:end] = basis_ref
-            for i, q in enumerate(qargs):
-                if row & (1 << i):
-                    basis_out[start:end] |= (1 << q)
-
-            alpha_out[start:end] = U[row, col] * alpha
-        
-        return basis_out, alpha_out
-
     def truncate(self, p_frac=1., n_max=0):
         basis = self.data.index.values
         alpha = self.data.values
 
-        basis, alpha = self._truncate_kernel(basis, alpha, p_frac, n_max)
-
-        self.data = pd.Series(data=alpha, index=basis)
-        return self
-
-    @staticmethod
-    @numba.jit(nopython=True, cache=True)
-    def _truncate_kernel(basis, alpha, p_frac, n_max):
         prob = np.abs(alpha)**2
         idx = np.argsort(prob)[::-1]
 
@@ -101,4 +75,5 @@ class SparseStatevector:
             alpha = alpha[idx]
             alpha /= np.linalg.norm(alpha)
 
-        return basis, alpha
+        self.data = pd.Series(data=alpha, index=basis)
+        return self
