@@ -3,6 +3,11 @@ import numpy as np
 import pandas as pd
 from qiskit.quantum_info import Operator
 
+# ---------------------------------------------------------------------------------
+# * Change output to stdout, to a single line, if possible
+# * Reassess whether some parts of the _evolve_kernel should be moved to the caller
+# ---------------------------------------------------------------------------------
+
 class SparseStatevector:
 
     def __init__(self, num_qubits):
