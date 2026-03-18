@@ -31,19 +31,17 @@ class SparseStatevector:
 
         bits = (basis[:, np.newaxis] >> qargs[np.newaxis, :]) & 1
         col = np.bitwise_or.reduce(bits << qrange, axis=1)
-        col = np.tile(col, dim)
 
         row = np.arange(dim)
         bits = (row[:, np.newaxis] >> qrange[np.newaxis, :]) & 1
         bits = np.bitwise_or.reduce(bits << qargs, axis=1)
 
-        row = np.repeat(row, basis.size)
-        bits = np.repeat(bits, basis.size)
-
         basis_out = basis & ~np.bitwise_or.reduce(1 << qargs)
-        basis_out = np.tile(basis_out, dim) | bits
+        basis_out = basis_out[np.newaxis, :] | bits[:, np.newaxis]
+        basis_out = basis_out.ravel()
 
-        alpha_out = U[row, col] * np.tile(alpha, dim)
+        alpha_out = U[:, col] * alpha[np.newaxis, :]
+        alpha_out = alpha_out.ravel()
 
         new = pd.Series(data=alpha_out, index=basis_out)
         new = new.groupby(level=0).sum()
