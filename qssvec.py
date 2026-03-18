@@ -58,21 +58,21 @@ class SparseStatevector:
         basis = self.data.index.values
 
         prob = np.abs(alpha)**2
-        idx = np.argsort(prob)[::-1]
+        sort = np.argsort(prob)[::-1]
 
         if 0. < p_frac < 1.:
-            prob = prob[idx]
+            prob = prob[sort]
             frac = np.cumsum(prob) / np.sum(prob)
             n = np.searchsorted(frac, p_frac) + 1
-            idx = idx[:n]
+            sort = sort[:n]
 
-        if 0 < n_max < len(idx):
-            idx = idx[:n_max]
+        if 0 < n_max < len(sort):
+            sort = sort[:n_max]
 
-        if 0 < len(idx) < len(basis):
-            idx = np.sort(idx)
-            basis = basis[idx]
-            alpha = alpha[idx]
+        if 0 < len(sort) < len(basis):
+            sort = np.sort(sort)
+            basis = basis[sort]
+            alpha = alpha[sort]
             norm = np.linalg.norm(alpha)
             if norm > 0.:
                 alpha /= norm
