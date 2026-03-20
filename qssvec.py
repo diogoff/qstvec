@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 
-from qiskit.quantum_info import Operator
-
 class SparseStatevector:
 
     def __init__(self, num_qubits):
@@ -18,11 +16,11 @@ class SparseStatevector:
             out[key] = alpha
         return out
 
-    def evolve(self, operation, qargs):
+    def evolve(self, U, qargs):
         alpha = self.data.values
         basis = self.data.index.values
 
-        U = Operator(operation).data.astype(alpha.dtype)
+        U = U.astype(alpha.dtype)
         qargs = np.asarray(qargs)
         qrange = np.arange(qargs.size)
 
@@ -35,7 +33,7 @@ class SparseStatevector:
         alpha_out = U[:, cols] * alpha[np.newaxis, :]
         alpha_out = alpha_out.ravel()
 
-        rows = np.arange(dim)
+        rows = np.arange(U.shape[0])
         bits = (rows[:, np.newaxis] >> qrange) & 1
         bits = np.bitwise_or.reduce(bits << qargs, axis=1)
 

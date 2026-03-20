@@ -1,5 +1,5 @@
 from qiskit import QuantumCircuit
-from qiskit.quantum_info import Statevector
+from qiskit.quantum_info import Statevector, Operator
 
 from qssvec import SparseStatevector
 
@@ -21,7 +21,9 @@ for ci in qc.data:
     print(f'[{ci_num}/{qc_size}] {name} | {' '.join(map(str, params))} | {' '.join(map(str, qargs))}')
 
     sv1 = sv1.evolve(ci.operation, qargs)
-    sv2 = sv2.evolve(ci.operation, qargs).truncate()
+
+    U = Operator(ci.operation).data
+    sv2 = sv2.evolve(U, qargs).truncate()
 
     d1 = sv1.to_dict()
     d2 = sv2.to_dict()

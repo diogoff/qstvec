@@ -5,6 +5,7 @@ import time
 import psutil
 
 from qiskit import QuantumCircuit
+from qiskit.quantum_info import Operator
 from qssvec import SparseStatevector
 
 if len(sys.argv) < 2:
@@ -28,7 +29,8 @@ for ci in qc.data:
     params = ci.operation.params
     qargs = [qc.find_bit(q).index for q in ci.qubits]
 
-    sv = sv.evolve(ci.operation, qargs)
+    U = Operator(ci.operation).data
+    sv = sv.evolve(U, qargs)
     
     p_frac = 0.999
     sv = sv.truncate(p_frac)
