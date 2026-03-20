@@ -7,9 +7,9 @@ class SparseStatevector:
 
     def __init__(self, num_qubits):
         self.num_qubits = num_qubits
-        alpha = 1.
-        basis = pd.Index([0], dtype=np.int64)
-        self.data = pd.Series(data=alpha, index=basis, dtype=np.complex128)
+        alpha = np.array([1.+0.j], dtype=np.complex128)
+        basis = np.array([0], dtype=np.int64)
+        self.data = pd.Series(data=alpha, index=basis)
 
     def to_dict(self):
         out = dict()
@@ -40,7 +40,7 @@ class SparseStatevector:
         bits = np.bitwise_or.reduce(bits << qargs, axis=1)
 
         basis_out = basis & ~np.bitwise_or.reduce(1 << qargs)
-        basis_out = basis_out[np.newaxis, :] | bits[:, np.newaxis]
+        basis_out = bits[:, np.newaxis] | basis_out[np.newaxis, :]
         basis_out = basis_out.ravel()
 
         new = pd.Series(data=alpha_out, index=basis_out)
@@ -57,22 +57,22 @@ class SparseStatevector:
         alpha = self.data.values
         basis = self.data.index.values
 
-        prob = np.abs(alpha)**2
-        sort = np.argsort(prob)[::-1]
+        probs = np.abs(alpha)**2
+        index = np.argsort(probs)[::-1]
 
         if 0. < p_frac < 1.:
-            prob = prob[sort]
-            frac = np.cumsum(prob) / np.sum(prob)
-            n = np.searchsorted(frac, p_frac) + 1
-            sort = sort[:n]
+            probs = probs[index]
+            p_fracs = np.cumsum(probs) / np.sum(probs)
+            n = np.searchsorted(p_fracs, p_frac) + 1
+            index = index[:n]
 
-        if 0 < n_max < len(sort):
-            sort = sort[:n_max]
+        if 0 < n_max < len(index):
+            index = index[:n_max]
 
-        if 0 < len(sort) < len(basis):
-            sort = np.sort(sort)
-            basis = basis[sort]
-            alpha = alpha[sort]
+        if 0 < len(index) < len(basis):
+            index = np.sort(index)
+            basis = basis[index]
+            alpha = alpha[index]
             norm = np.linalg.norm(alpha)
             if norm > 0.:
                 alpha /= norm
