@@ -30,8 +30,9 @@ def get_node_qset(dag, node):
 def get_sort_key(dag, qset, node):
     node_qset = get_node_qset(dag, node)
     a = len(qset | node_qset)
-    b = sorted(node_qset)
-    return (a, b)
+    b = len(node_qset)
+    c = sorted(node_qset)
+    return (a, b, c)
 
 while dag.size() > 0:
     key = lambda node: get_sort_key(dag, qset, node)
