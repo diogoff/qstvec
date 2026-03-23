@@ -1,9 +1,14 @@
+import os
 import sys
-import copy
+import math
+import time
+import psutil
 
 from qiskit import QuantumCircuit
-from qiskit.circuit import CircuitInstruction
 from qiskit.converters import circuit_to_dag
+from qiskit.quantum_info import Operator
+
+from qssvec import SparseStatevector
 
 # -----------------------------------------------------------------------------
 
@@ -15,67 +20,54 @@ qc = QuantumCircuit.from_qasm_file(sys.argv[1])
 
 # -----------------------------------------------------------------------------
 
-output_seq = []
+dag = circuit_to_dag(qc)
+qset = set()
+seq = []
 
-def traverse(current_dag, current_qset, current_seq):
-    if current_dag.size() == 0:
-        if not output_seq:
-            output_seq = copy.deepcopy(current_seq)
-        else:
-            better = False
-            for i in range(current_seq):
-                if current_seq[i][0] < output_seq[i][0]:
-                    better = True
-                    break
-            if better:
-                output_seq = copy.deepcopy(current_seq)
-        return
+def get_node_qset(dag, node):
+    return set(dag.find_bit(q).index for q in node.qargs)
 
-    while True:
-        front_nodes = dict()
-        for node in current_dag.front_layer():
-            qset = frozenset(node.qargs)
-            if qset not in front_nodes:
-                front_nodes[qset] = []
-            front_nodes[qset].append(node)
+def get_sort_key(dag, qset, node):
+    node_qset = get_node_qset(dag, node)
+    a = len(qset | node_qset)
+    b = sorted(node_qset)
+    return (a, b)
 
-        if len(front_nodes) == 0:
-            output_seqs.append(current_seq)
-            return
-
-        ready_nodes = dict()
-        for qset in front_nodes:
-            if qset <= current_qset:
-                ready_nodes[qset] = front_nodes[qset]
-
-        if len(ready_nodes) == 0:
-            break
-
-        for qset in ready_nodes:
-            for node in ready_nodes[qset]:
-                current_dag.remove_op_node(node)
-                current_seq.append((qset, node))
-
-    for qset in front_nodes:
-        new_current_qset = current_qset | qset
-        new_current_dag = copy.deepcopy(current_dag)
-        new_current_seq = copy.deepcopy(current_seq)
-        for node in front_nodes[qset]:
-            new_current_dag.remove_op_node(node)
-            new_current_seq.append((qset, node))
-        traverse(new_current_dag, new_current_qset, new_current_seq, output_seq)
+while dag.size() > 0:
+    key = lambda node: get_sort_key(dag, qset, node)
+    node = sorted(dag.front_layer(), key=key)[0]
+    dag.remove_op_node(node)
+    seq.append(node)
+    qset |= get_node_qset(dag, node)
 
 # -----------------------------------------------------------------------------
 
+sv = SparseStatevector(qc.num_qubits)
 
-for q in range(qc.num_qubits):
-    current_dag = circuit_to_dag(qc)
-    current_qset = frozenset({current_dag.qubits[q]})
-    current_seq = []
-    traverse(current_dag, current_qset, current_seq, output_seq)
+t0 = time.perf_counter()
 
-print(f'Sequence with {len(output_seq)} instructions:')
-for i, node in enumerate(output_seq):
-    name = node.op.name
-    qind = [qc.find_bit(q).index for q in node.qargs]
-    print(f'{i+1}) {node.op.name} {' '.join(map(str, qind))}')
+for i, node in enumerate(seq):
+    U = Operator(node.op).data
+    qargs = [qc.find_bit(q).index for q in node.qargs]
+
+    sv.evolve(U, qargs).truncate(0.999)
+    n = len(sv.data)
+
+    mag = sv.data.abs()
+    idx = mag.idxmax()
+    bit = f'{idx:0{qc.num_qubits}b}'
+    mag = mag[idx]
+
+    pid = psutil.Process(os.getpid())
+    mem = pid.memory_info().rss / 1024**3
+
+    t1 = time.perf_counter()
+
+    print()
+    print(f'{i+1}/{len(seq)} | {(i+1)/len(seq)*100.:.1f}%')
+    print(f'{node.op.name} | {' '.join(map(str, node.op.params))} | qubit {' '.join(map(str, qargs))}')
+    print(f'{bit} | mag {mag:.3e}')
+    print(f'{n} terms | order 2^{int(math.ceil(math.log2(n)))} | mem {mem:.1f} GB')
+    print(f'{t1-t0:.1f} s/it | {(t1-t0)*(len(seq)-(i+1))/3600:.1f} hours')
+
+    t0 = t1
