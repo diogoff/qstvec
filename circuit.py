@@ -56,12 +56,8 @@ for i, node in enumerate(seq, start=1):
         qargs = [qc.find_bit(q).index for q in node.qargs]
 
         sv.evolve(U, qargs).truncate(0.999)
-        n_vec = len(sv.data)
-
-        mag = sv.data.abs()
-        idx = mag.idxmax()
-        bit = f'{idx:0{qc.num_qubits}b}'
-        mag = mag[idx]
+        n_vec = len(sv)
+        b_str, prob = sv.bit_string(return_prob=True)
 
         pid = psutil.Process(os.getpid())
         mem = pid.memory_info().rss / 1024**3
@@ -72,7 +68,7 @@ for i, node in enumerate(seq, start=1):
         print(f'{sys.argv[1]} | {n_qubits} qubits | {n_seq} gates')
         print(f'{i}/{n_seq} | {i/n_seq*100.:.1f}%')
         print(f'{node.op.name} | {' '.join(map(str, node.op.params))} | qubit {' '.join(map(str, qargs))}')
-        print(f'{bit} | mag {mag:.3e}')
+        print(f'{b_str} | prob {prob:.3e}')
         print(f'{n_vec} terms | order 2^{int(math.ceil(math.log2(n_vec)))} | {mem:.1f} GB')
         print(f'{t1-t0:.1f} s/it | {(t1-t0)*(n_seq-i)/3600:.1f} hours')
 
