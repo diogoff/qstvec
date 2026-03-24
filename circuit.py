@@ -31,7 +31,7 @@ def get_sort_key(dag, qset, node):
     node_qset = get_node_qset(dag, node)
     a = len(qset | node_qset)
     b = len(node_qset)
-    c = sorted(node_qset)
+    c = tuple(sorted(node_qset))
     return (a, b, c)
 
 while dag.size() > 0:
@@ -47,28 +47,34 @@ sv = SparseStatevector(qc.num_qubits)
 
 t0 = time.perf_counter()
 
-for i, node in enumerate(seq):
-    U = Operator(node.op).data
-    qargs = [qc.find_bit(q).index for q in node.qargs]
+n_seq = len(seq)
 
-    sv.evolve(U, qargs).truncate(0.999)
-    n = len(sv.data)
+for i, node in enumerate(seq, start=1):
+    try:
+        U = Operator(node.op).data
+        qargs = [qc.find_bit(q).index for q in node.qargs]
 
-    mag = sv.data.abs()
-    idx = mag.idxmax()
-    bit = f'{idx:0{qc.num_qubits}b}'
-    mag = mag[idx]
+        sv.evolve(U, qargs).truncate(0.999)
+        n_vec = len(sv.data)
 
-    pid = psutil.Process(os.getpid())
-    mem = pid.memory_info().rss / 1024**3
+        mag = sv.data.abs()
+        idx = mag.idxmax()
+        bit = f'{idx:0{qc.num_qubits}b}'
+        mag = mag[idx]
 
-    t1 = time.perf_counter()
+        pid = psutil.Process(os.getpid())
+        mem = pid.memory_info().rss / 1024**3
 
-    print()
-    print(f'{i+1}/{len(seq)} | {(i+1)/len(seq)*100.:.1f}%')
-    print(f'{node.op.name} | {' '.join(map(str, node.op.params))} | qubit {' '.join(map(str, qargs))}')
-    print(f'{bit} | mag {mag:.3e}')
-    print(f'{n} terms | order 2^{int(math.ceil(math.log2(n)))} | mem {mem:.1f} GB')
-    print(f'{t1-t0:.1f} s/it | {(t1-t0)*(len(seq)-(i+1))/3600:.1f} hours')
+        t1 = time.perf_counter()
 
-    t0 = t1
+        print()
+        print(f'{i}/{n_seq} | {i/n_seq*100.:.1f}%')
+        print(f'{node.op.name} | {' '.join(map(str, node.op.params))} | qubit {' '.join(map(str, qargs))}')
+        print(f'{bit} | mag {mag:.3e}')
+        print(f'{n_vec} terms | order 2^{int(math.ceil(math.log2(n_vec)))} | {mem:.1f} GB')
+        print(f'{t1-t0:.1f} s/it | {(t1-t0)*(n_seq-i)/3600:.1f} hours')
+
+        t0 = t1
+
+    except KeyboardInterrupt:
+        break
