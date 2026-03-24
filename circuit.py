@@ -68,6 +68,7 @@ for i, node in enumerate(seq, start=1):
         t1 = time.perf_counter()
 
         print()
+        print(f'{sys.argv[1]}')
         print(f'{i}/{n_seq} | {i/n_seq*100.:.1f}%')
         print(f'{node.op.name} | {' '.join(map(str, node.op.params))} | qubit {' '.join(map(str, qargs))}')
         print(f'{bit} | mag {mag:.3e}')
