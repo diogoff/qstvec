@@ -43,17 +43,16 @@ class SparseStatevector:
         basis_out = bits[:, np.newaxis] | basis_out[np.newaxis, :]
         basis_out = basis_out.ravel()
 
-        basis_out, basis_inv = np.unique(basis_out, return_inverse=True)
-        zeros_out = np.zeros(basis_out.shape, dtype=alpha_out.dtype)
-        np.add.at(zeros_out, basis_inv, alpha_out)
-        alpha_out = zeros_out
+        basis, index = np.unique(basis_out, return_inverse=True)
+        alpha = np.zeros(basis.shape, dtype=alpha.dtype)
+        np.add.at(alpha, index, alpha_out)
 
-        mask = np.abs(alpha_out) > 0.
-        basis_out = basis_out[mask]
-        alpha_out = alpha_out[mask]
+        mask = np.abs(alpha) > 0.
+        alpha = alpha[mask]
+        basis = basis[mask]
 
-        self.alpha = alpha_out
-        self.basis = basis_out
+        self.alpha = alpha
+        self.basis = basis
         return self
 
     def truncate(self, p_frac=1., n_max=0):
