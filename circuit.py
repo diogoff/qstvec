@@ -55,7 +55,7 @@ for i, node in enumerate(seq, start=1):
         U = Operator(node.op).data
         qargs = [qc.find_bit(q).index for q in node.qargs]
 
-        sv.evolve(U, qargs).truncate(0.999)
+        sv.evolve(U, qargs).truncate(0.995)
         n_vec = len(sv)
         b_str, prob = sv.bit_string(return_prob=True)
 
