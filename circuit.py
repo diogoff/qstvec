@@ -48,6 +48,7 @@ sv = SparseStatevector(qc.num_qubits)
 t0 = time.perf_counter()
 
 n_seq = len(seq)
+n_qubits = qc.num_qubits
 
 for i, node in enumerate(seq, start=1):
     try:
@@ -68,7 +69,7 @@ for i, node in enumerate(seq, start=1):
         t1 = time.perf_counter()
 
         print()
-        print(f'{sys.argv[1]}')
+        print(f'{sys.argv[1]} | {n_qubits} qubits | {n_seq} gates')
         print(f'{i}/{n_seq} | {i/n_seq*100.:.1f}%')
         print(f'{node.op.name} | {' '.join(map(str, node.op.params))} | qubit {' '.join(map(str, qargs))}')
         print(f'{bit} | mag {mag:.3e}')
