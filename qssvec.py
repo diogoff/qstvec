@@ -2,8 +2,8 @@ import numpy as np
 
 class SparseStatevector:
 
-    def __init__(self, num_qubits):
-        self.num_qubits = num_qubits
+    def __init__(self, n_qubits):
+        self.n_qubits = n_qubits
         self.alpha = np.array([1.+0.j], dtype=np.complex128)
         self.basis = np.array([0], dtype=np.int64)
 
@@ -14,7 +14,7 @@ class SparseStatevector:
         out = dict()
         index = np.argsort(self.basis)
         for b, a in zip(self.basis[index], self.alpha[index]):
-            key = f'{b:0{self.num_qubits}b}'
+            key = f'{b:0{self.n_qubits}b}'
             out[key] = a
         return out
 
@@ -89,7 +89,7 @@ class SparseStatevector:
     def bit_string(self, return_prob=False):
         probs = np.abs(self.alpha)**2
         i = np.argmax(probs)
-        out = f'{self.basis[i]:0{self.num_qubits}b}'
+        out = f'{self.basis[i]:0{self.n_qubits}b}'
         if return_prob:
             return out, probs[i]
         return out
