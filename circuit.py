@@ -64,7 +64,7 @@ for i, node in enumerate(seq, start=1):
         s_qargs = ' '.join(map(str, qargs))
         n_vec = len(sv)
         exp2 = int(math.ceil(math.log2(n_vec)))
-        mem = psutil.Process(os.getpid()).memory_info().wset / 1024**3
+        mem = psutil.Process(os.getpid()).memory_info().vms / 1024**3
         eta = (t1 - t0) * (n_seq - i) / 3600.
 
         print()
