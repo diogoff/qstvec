@@ -72,7 +72,7 @@ for i, node in enumerate(seq, start=1):
         print(f'{sys.argv[1]} | {n_qubits} qubits | {n_seq} gates')
         print(f'{node.op.name} | {s_params} | qargs {s_qargs}')
         print(f'{b_str} | prob {prob:.3e}')
-        print(f'{n_vec} terms | order 2^{exp2} | {mem:.1f} GB')
+        print(f'{n_vec:,} terms | order 2^{exp2} | {mem:.1f} GB')
         print(f'{t1-t0:.1f} s/it | {eta:.1f} hours')
 
     except KeyboardInterrupt:
