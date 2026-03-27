@@ -75,7 +75,6 @@ class SparseStatevector:
             index = index[:n_max]
 
         if 0 < len(index) < len(basis):
-            index = np.sort(index)
             basis = basis[index]
             alpha = alpha[index]
             norm = np.linalg.norm(alpha)
