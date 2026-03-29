@@ -74,7 +74,7 @@ for k, block in enumerate(blocks, start=1):
             U = U.compose(Operator(node.op), qargs=qargs_idx)
 
         sv.evolve(U.data, qargs)
-        sv.truncate(p_frac=0.999, n_max=2**21)
+        sv.truncate(p_frac=0.999, n_max=2**20)
         b_str, prob = sv.bit_string(return_prob=True)
 
         t1 = time.perf_counter()
