@@ -82,7 +82,7 @@ for i, node in enumerate(seq, start=1):
 
         sv.evolve(U, qargs)
         if node.op.name == truncate_on:
-            sv.truncate(p_frac=0.95)
+            sv.truncate(p_frac=0.99)
         b_str, prob = sv.bit_string(return_prob=True)
 
         t1 = time.perf_counter()
