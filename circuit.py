@@ -43,6 +43,31 @@ while dag.size() > 0:
 
 # -----------------------------------------------------------------------------
 
+names = []
+for node in seq:
+    name = node.op.name
+    if (len(names) == 0) or (name != names[-1]):
+        names.append(name)
+
+blocks = []
+for name in names:
+    if (len(blocks) == 0) or (name in blocks[-1]):
+        blocks.append([name])
+    else:
+        blocks[-1].append(name)
+
+counts = dict()    
+for block in blocks:
+    block = tuple(block)
+    if block not in counts:
+        counts[block] = 0
+    counts[block] += 1
+
+counts = sorted(counts.items(), key=lambda x: x[1])
+truncate_on = counts[-1][0][-1]
+
+# -----------------------------------------------------------------------------
+
 n_seq = len(seq)
 n_qubits = qc.num_qubits
 
@@ -55,7 +80,9 @@ for i, node in enumerate(seq, start=1):
         U = Operator(node.op).data
         qargs = [qc.find_bit(q).index for q in node.qargs]
 
-        sv.evolve(U, qargs).truncate(p_frac=0.99)
+        sv.evolve(U, qargs)
+        if node.op.name == truncate_on:
+            sv.truncate(p_frac=0.95)
         b_str, prob = sv.bit_string(return_prob=True)
 
         t1 = time.perf_counter()
