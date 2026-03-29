@@ -3,6 +3,7 @@ import sys
 import math
 import time
 import psutil
+import numpy as np
 
 from qiskit import QuantumCircuit
 from qiskit.converters import circuit_to_dag
@@ -43,63 +44,55 @@ while dag.size() > 0:
 
 # -----------------------------------------------------------------------------
 
-names = []
-for node in seq:
-    name = node.op.name
-    if (len(names) == 0) or (name != names[-1]):
-        names.append(name)
-
 blocks = []
-for name in names:
-    if (len(blocks) == 0) or (name in blocks[-1]):
-        blocks.append([name])
+
+for node in seq:
+    if len(blocks) == 0:
+        blocks.append([node])
+    elif node.op.name == blocks[-1][-1].op.name:
+        blocks[-1].append(node)
+    elif node.op.name in [n.op.name for n in blocks[-1]]:
+        blocks.append([node])
     else:
-        blocks[-1].append(name)
-
-counts = dict()    
-for block in blocks:
-    block = tuple(block)
-    if block not in counts:
-        counts[block] = 0
-    counts[block] += 1
-
-counts = sorted(counts.items(), key=lambda x: x[1])
-truncate_on = counts[-1][0][-1]
+        blocks[-1].append(node)
 
 # -----------------------------------------------------------------------------
 
-n_seq = len(seq)
-n_qubits = qc.num_qubits
+sv = SparseStatevector(qc.num_qubits)
 
-sv = SparseStatevector(n_qubits)
+n_done = 0
 
-for i, node in enumerate(seq, start=1):
+for k, block in enumerate(blocks, start=1):
     try:
         t0 = time.perf_counter()
 
-        U = Operator(node.op).data
-        qargs = [qc.find_bit(q).index for q in node.qargs]
+        qargs = sorted(set([qc.find_bit(q).index for node in block for q in node.qargs]))
+        U = Operator(np.eye(2 ** len(qargs), dtype=complex))
+        
+        for node in block:
+            qargs_idx = [qargs.index(qc.find_bit(q).index) for q in node.qargs]
+            U = U.compose(Operator(node.op), qargs=qargs_idx)
 
-        sv.evolve(U, qargs)
-        if node.op.name == truncate_on:
-            sv.truncate(p_frac=0.99)
+        sv.evolve(U.data, qargs)
+        sv.truncate(p_frac=0.999, n_max=2**21)
         b_str, prob = sv.bit_string(return_prob=True)
 
         t1 = time.perf_counter()
 
-        s_params = ' '.join(map(str, node.op.params))
-        s_qargs = ' '.join(map(str, qargs))
+        print()
+        n_done += len(block)
+        print(f'{n_done}/{qc.size()} | {n_done/qc.size()*100.:.1f}%')
+        print(f'{sys.argv[1]} | {qc.num_qubits} qubits | {qc.size()} gates')
+        for node in block:
+            s_params = ' '.join(map(str, node.op.params))
+            s_qargs = ' '.join(map(str, [qc.find_bit(q).index for q in node.qargs]))
+            print(f'{node.op.name} | {s_params} | qargs {s_qargs}')
+        print(f'{b_str} | prob {prob:.3e}')
         n_vec = len(sv)
         exp2 = int(math.ceil(math.log2(n_vec)))
         mem = psutil.Process(os.getpid()).memory_info().vms / 1024**3
-        eta = (t1 - t0) * (n_seq - i) / 3600.
-
-        print()
-        print(f'{i}/{n_seq} | {i/n_seq*100.:.1f}%')
-        print(f'{sys.argv[1]} | {n_qubits} qubits | {n_seq} gates')
-        print(f'{node.op.name} | {s_params} | qargs {s_qargs}')
-        print(f'{b_str} | prob {prob:.3e}')
         print(f'{n_vec:,} terms | order 2^{exp2} | {mem:.1f} GB')
+        eta = (t1 - t0) * (len(blocks) - k) / 3600.
         print(f'{t1-t0:.1f} s/it | {eta:.1f} hours')
 
     except KeyboardInterrupt:
