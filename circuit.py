@@ -25,44 +25,43 @@ max_qubits = max([len(ci.qubits) for ci in qc.data])
 
 dag = circuit_to_dag(qc)
 blocks = []
-block_qset = set()
+qset_block = set()
+qset_all = set()
 
-def get_node_qset(node):
+def get_qset(node):
     return set(dag.find_bit(q).index for q in node.qargs)
 
-def get_sort_key(node):
-    node_qset = get_node_qset(node)
-    a = len(block_qset | node_qset)
-    b = len(node_qset)
-    c = tuple(sorted(node_qset))
-    return (a, b, c)
+def sort_key(node):
+    qset_node = get_qset(node)
+    return (len(qset_all | qset_node),
+            len(qset_block | qset_node),
+            len(qset_node),
+            tuple(sorted(qset_node)))
 
 while dag.size() > 0:
-    node = sorted(dag.front_layer(), key=get_sort_key)[0]
-    node_qset = get_node_qset(node)    
+    node = sorted(dag.front_layer(), key=sort_key)[0]
+    qset_node = get_qset(node)    
     dag.remove_op_node(node)
 
     if len(blocks) == 0:
         blocks.append([node])
-        block_qset = node_qset
+        qset_block = qset_node
+        qset_all = qset_node
         continue
 
-    if node_qset.issubset(block_qset):
+    if qset_node.issubset(qset_block):
         blocks[-1].append(node)
         continue
 
-    if node_qset.isdisjoint(block_qset):
-        blocks.append([node])
-        block_qset = node_qset
-        continue
-    
-    if len(node_qset.union(block_qset)) <= max_qubits:
+    if len(qset_node.union(qset_block)) <= max_qubits:
         blocks[-1].append(node)
-        block_qset |= node_qset
+        qset_block |= qset_node
+        qset_all |= qset_node
         continue
 
     blocks.append([node])
-    block_qset = node_qset
+    qset_block = qset_node
+    qset_all |= qset_node
 
 # -----------------------------------------------------------------------------
 
