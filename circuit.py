@@ -22,39 +22,45 @@ qc = QuantumCircuit.from_qasm_file(sys.argv[1])
 # -----------------------------------------------------------------------------
 
 dag = circuit_to_dag(qc)
-qset = set()
-seq = []
+blocks = []
+current_qset = set()
 
-def get_node_qset(dag, node):
+def get_node_qset(node):
     return set(dag.find_bit(q).index for q in node.qargs)
 
-def get_sort_key(dag, qset, node):
-    node_qset = get_node_qset(dag, node)
-    a = len(qset | node_qset)
+def get_sort_key(node):
+    node_qset = get_node_qset(node)
+    a = len(current_qset | node_qset)
     b = len(node_qset)
     c = tuple(sorted(node_qset))
     return (a, b, c)
 
 while dag.size() > 0:
-    key = lambda node: get_sort_key(dag, qset, node)
-    node = sorted(dag.front_layer(), key=key)[0]
+    node = sorted(dag.front_layer(), key=get_sort_key)[0]
+    node_qset = get_node_qset(node)    
     dag.remove_op_node(node)
-    seq.append(node)
-    qset |= get_node_qset(dag, node)
 
-# -----------------------------------------------------------------------------
-
-blocks = []
-
-for node in seq:
     if len(blocks) == 0:
         blocks.append([node])
-    elif node.op.name == blocks[-1][-1].op.name:
+        current_qset = node_qset
+        continue
+
+    if node_qset.issubset(current_qset):
         blocks[-1].append(node)
-    elif node.op.name in [n.op.name for n in blocks[-1]]:
+        continue
+
+    if node_qset.isdisjoint(current_qset):
         blocks.append([node])
-    else:
+        current_qset = node_qset
+        continue
+    
+    if len(current_qset) < 2:
         blocks[-1].append(node)
+        current_qset |= node_qset
+        continue
+
+    blocks.append([node])
+    current_qset = node_qset
 
 # -----------------------------------------------------------------------------
 
