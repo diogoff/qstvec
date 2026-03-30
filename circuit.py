@@ -33,13 +33,13 @@ def get_qset(node):
 
 def sort_key(node):
     qset_node = get_qset(node)
-    return (len(qset_all | qset_node),
-            len(qset_block | qset_node),
-            len(qset_node),
+    return (len(qset_all | qset_node) - len(qset_all),
+            len(qset_block | qset_node) - len(qset_block),
+            len(qset_node) * (-1),
             tuple(sorted(qset_node)))
 
 while dag.size() > 0:
-    node = sorted(dag.front_layer(), key=sort_key)[0]
+    node = min(dag.front_layer(), key=sort_key)
     qset_node = get_qset(node)    
     dag.remove_op_node(node)
 
