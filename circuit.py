@@ -19,18 +19,20 @@ if len(sys.argv) < 2:
 
 qc = QuantumCircuit.from_qasm_file(sys.argv[1])
 
+max_qubits = max([len(ci.qubits) for ci in qc.data])
+
 # -----------------------------------------------------------------------------
 
 dag = circuit_to_dag(qc)
 blocks = []
-current_qset = set()
+block_qset = set()
 
 def get_node_qset(node):
     return set(dag.find_bit(q).index for q in node.qargs)
 
 def get_sort_key(node):
     node_qset = get_node_qset(node)
-    a = len(current_qset | node_qset)
+    a = len(block_qset | node_qset)
     b = len(node_qset)
     c = tuple(sorted(node_qset))
     return (a, b, c)
@@ -42,31 +44,31 @@ while dag.size() > 0:
 
     if len(blocks) == 0:
         blocks.append([node])
-        current_qset = node_qset
+        block_qset = node_qset
         continue
 
-    if node_qset.issubset(current_qset):
+    if node_qset.issubset(block_qset):
         blocks[-1].append(node)
         continue
 
-    if node_qset.isdisjoint(current_qset):
+    if node_qset.isdisjoint(block_qset):
         blocks.append([node])
-        current_qset = node_qset
+        block_qset = node_qset
         continue
     
-    if len(current_qset) < 2:
+    if len(node_qset.union(block_qset)) <= max_qubits:
         blocks[-1].append(node)
-        current_qset |= node_qset
+        block_qset |= node_qset
         continue
 
     blocks.append([node])
-    current_qset = node_qset
+    block_qset = node_qset
 
 # -----------------------------------------------------------------------------
 
 sv = SparseStatevector(qc.num_qubits)
 
-n_done = 0
+counter = 0
 
 for k, block in enumerate(blocks, start=1):
     try:
@@ -80,26 +82,35 @@ for k, block in enumerate(blocks, start=1):
             U = U.compose(Operator(node.op), qargs=qargs_idx)
 
         sv.evolve(U.data, qargs)
-        sv.truncate(p_frac=0.999, n_max=2**20)
+        sv.truncate(n_max=2**24)
         b_str, prob = sv.bit_string(return_prob=True)
 
         t1 = time.perf_counter()
 
         print()
-        n_done += len(block)
-        print(f'{n_done}/{qc.size()} | {n_done/qc.size()*100.:.1f}%')
+
+        counter += len(block)
+        print(f'{counter}/{qc.size()} | {counter/qc.size()*100.:.1f}%')
         print(f'{sys.argv[1]} | {qc.num_qubits} qubits | {qc.size()} gates')
+
         for node in block:
-            s_params = ' '.join(map(str, node.op.params))
-            s_qargs = ' '.join(map(str, [qc.find_bit(q).index for q in node.qargs]))
-            print(f'{node.op.name} | {s_params} | qargs {s_qargs}')
+            qargs = set(qc.find_bit(q).index for q in node.qargs)
+            print(f'{node.op.name} {qargs}')
+
         print(f'{b_str} | prob {prob:.3e}')
+
         n_vec = len(sv)
         exp2 = int(math.ceil(math.log2(n_vec)))
         mem = psutil.Process(os.getpid()).memory_info().vms / 1024**3
         print(f'{n_vec:,} terms | order 2^{exp2} | {mem:.1f} GB')
-        eta = (t1 - t0) * (len(blocks) - k) / 3600.
-        print(f'{t1-t0:.1f} s/it | {eta:.1f} hours')
+
+        eta = (t1 - t0) * (len(blocks) - k)
+        if eta >= 3600:
+            print(f'{t1-t0:.1f} s/it | {eta/3600:.1f} hours')
+        elif eta >= 60:
+            print(f'{t1-t0:.1f} s/it | {eta/60:.1f} minutes')
+        else:
+            print(f'{t1-t0:.1f} s/it | {eta:.1f} seconds')
 
     except KeyboardInterrupt:
         break
