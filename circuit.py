@@ -25,8 +25,8 @@ max_qubits = max([len(ci.qubits) for ci in qc.data])
 
 dag = circuit_to_dag(qc)
 blocks = []
-qset_block = set()
 qset_all = set()
+qset_block = set()
 
 def get_qset(node):
     return set(dag.find_bit(q).index for q in node.qargs)
@@ -51,7 +51,7 @@ while dag.size() > 0:
     if qset_node.issubset(qset_block):
         blocks[-1].append(node)
         continue
-
+    
     if len(qset_node.union(qset_block)) <= max_qubits:
         blocks[-1].append(node)
         qset_block |= qset_node
@@ -66,7 +66,7 @@ while dag.size() > 0:
 
 sv = SparseStatevector(qc.num_qubits)
 
-counter = 0
+count_nodes = 0
 
 for k, block in enumerate(blocks, start=1):
     try:
@@ -80,15 +80,15 @@ for k, block in enumerate(blocks, start=1):
             U = U.compose(Operator(node.op), qargs=qargs_idx)
 
         sv.evolve(U.data, qargs)
-        sv.truncate(p_frac=0.98)
+        sv.truncate(p_frac=0.99)
         b_str, prob = sv.bit_string(return_prob=True)
 
         t1 = time.perf_counter()
 
         print()
 
-        counter += len(block)
-        print(f'{counter}/{qc.size()} | {counter/qc.size()*100.:.1f}%')
+        count_nodes += len(block)
+        print(f'{count_nodes}/{qc.size()} | {count_nodes/qc.size()*100.:.1f}%')
         print(f'{sys.argv[1]} | {qc.num_qubits} qubits | {qc.size()} gates')
 
         for node in block:

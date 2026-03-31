@@ -22,7 +22,7 @@ class SparseStatevector:
         alpha = self.alpha
         basis = self.basis
 
-        U = U.astype(alpha.dtype)
+        U = np.asarray(U, dtype=alpha.dtype)
         qargs = np.asarray(qargs)
         qrange = np.arange(qargs.size)
 
@@ -30,16 +30,16 @@ class SparseStatevector:
         assert U.shape == (dim, dim)
 
         bits = (basis[:, np.newaxis] >> qargs) & 1
-        cols = np.bitwise_or.reduce(bits << qrange, axis=1)
+        cols = np.sum(bits << qrange, axis=1)
 
         alpha_out = U[:, cols] * alpha[np.newaxis, :]
         alpha_out = alpha_out.ravel()
 
         rows = np.arange(U.shape[0])
         bits = (rows[:, np.newaxis] >> qrange) & 1
-        bits = np.bitwise_or.reduce(bits << qargs, axis=1)
+        bits = np.sum(bits << qargs, axis=1)
 
-        basis_out = basis & ~np.bitwise_or.reduce(1 << qargs)
+        basis_out = basis & ~np.sum(1 << qargs)
         basis_out = bits[:, np.newaxis] | basis_out[np.newaxis, :]
         basis_out = basis_out.ravel()
 
