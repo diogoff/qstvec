@@ -72,7 +72,7 @@ for k, block in enumerate(blocks, start=1):
         t0 = time.perf_counter()
 
         qargs = sorted(set([qc.find_bit(q).index for node in block for q in node.qargs]))
-        U = ScalarOp(2 ** len(qargs))
+        U = ScalarOp(2 ** len(qargs), coeff=1.+0.j)
         
         for node in block:
             qargs_idx = [qargs.index(qc.find_bit(q).index) for q in node.qargs]

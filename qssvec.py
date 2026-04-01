@@ -34,7 +34,7 @@ class SparseStatevector:
         alpha_out = U[:, cols] * alpha[np.newaxis, :]
         alpha_out = alpha_out.ravel()
 
-        rows = np.arange(U.shape[0])
+        rows = np.arange(U.shape[0], dtype=basis.dtype)
         bits = (rows[:, np.newaxis] >> qrange) & 1
         bits = np.sum(bits << qargs, axis=1)
 
