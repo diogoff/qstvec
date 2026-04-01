@@ -79,7 +79,7 @@ for k, block in enumerate(blocks, start=1):
             U = U.compose(node.op, qargs=qargs_idx)
 
         sv.evolve(U.data, qargs)
-        sv.truncate(p_frac=0.99)
+        sv.truncate(p_frac=0.95)
         b_str, prob = sv.bit_string(return_prob=True)
 
         t1 = time.perf_counter()
@@ -92,14 +92,13 @@ for k, block in enumerate(blocks, start=1):
 
         for node in block:
             qargs = set(qc.find_bit(q).index for q in node.qargs)
-            print(f'{node.op.name} {qargs}')
+            print(f'| {node.op.name} {qargs}')
 
         print(f'{b_str} | prob {prob:.3e}')
 
-        n_vec = len(sv)
-        exp2 = int(math.ceil(math.log2(n_vec)))
+        log = int(math.ceil(math.log2(len(sv))))
         mem = psutil.Process(os.getpid()).memory_info().vms / 1024**3
-        print(f'{n_vec:,} terms | order 2^{exp2} | {mem:.1f} GB')
+        print(f'{len(sv):,} terms | order 2^{log} | {mem:.1f} GB')
 
         eta = (t1 - t0) * (len(blocks) - k)
         if eta >= 3600:
