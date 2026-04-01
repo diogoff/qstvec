@@ -3,11 +3,10 @@ import sys
 import math
 import time
 import psutil
-import numpy as np
 
 from qiskit import QuantumCircuit
 from qiskit.converters import circuit_to_dag
-from qiskit.quantum_info import Operator
+from qiskit.quantum_info import ScalarOp
 
 from qssvec import SparseStatevector
 
@@ -73,11 +72,11 @@ for k, block in enumerate(blocks, start=1):
         t0 = time.perf_counter()
 
         qargs = sorted(set([qc.find_bit(q).index for node in block for q in node.qargs]))
-        U = Operator(np.eye(2 ** len(qargs), dtype=complex))
+        U = ScalarOp(2 ** len(qargs))
         
         for node in block:
             qargs_idx = [qargs.index(qc.find_bit(q).index) for q in node.qargs]
-            U = U.compose(Operator(node.op), qargs=qargs_idx)
+            U = U.compose(node.op, qargs=qargs_idx)
 
         sv.evolve(U.data, qargs)
         sv.truncate(p_frac=0.99)

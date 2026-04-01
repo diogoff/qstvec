@@ -22,8 +22,8 @@ class SparseStatevector:
         basis = self.basis
 
         U = np.asarray(U, dtype=alpha.dtype)
-        qargs = np.asarray(qargs)
-        qrange = np.arange(qargs.size)
+        qargs = np.asarray(qargs, dtype=basis.dtype)
+        qrange = np.arange(qargs.size, dtype=basis.dtype)
 
         dim = 2 ** qargs.size
         assert U.shape == (dim, dim)
