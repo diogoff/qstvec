@@ -1,11 +1,13 @@
 import numpy as np
 
 class SparseStatevector:
+    _dtype_complex = np.complex128
+    _dtype_int = np.int64
 
     def __init__(self, n_qubits):
         self.n_qubits = n_qubits
-        self.alpha = np.array([1.+0.j], dtype=np.complex128)
-        self.basis = np.array([0], dtype=np.int64)
+        self.alpha = np.array([1.+0.j], dtype=self._dtype_complex)
+        self.basis = np.array([0], dtype=self._dtype_int)
 
     def __len__(self):
         return len(self.basis)
@@ -17,25 +19,22 @@ class SparseStatevector:
             out[key] = a
         return out
 
-    def evolve(self, U, qargs):
+    def evolve(self, U, qargs, eps=1e-15):
         alpha = self.alpha
         basis = self.basis
 
-        U = np.asarray(U, dtype=alpha.dtype)
-        qargs = np.asarray(qargs, dtype=basis.dtype)
-        qrange = np.arange(qargs.size, dtype=basis.dtype)
+        U = np.asarray(U, dtype=self._dtype_complex)
+        qargs = np.asarray(qargs, dtype=self._dtype_int)
+        qrange = np.arange(len(qargs), dtype=self._dtype_int)
 
-        dim = 2 ** qargs.size
-        assert U.shape == (dim, dim)
-
-        bits = (basis[:, np.newaxis] >> qargs) & 1
-        cols = np.sum(bits << qrange, axis=1)
+        cols = (basis[:, np.newaxis] >> qargs) & 1
+        cols = np.sum(cols << qrange, axis=1)
 
         alpha_out = U[:, cols] * alpha[np.newaxis, :]
         alpha_out = alpha_out.ravel()
 
-        rows = np.arange(U.shape[0], dtype=basis.dtype)
-        bits = (rows[:, np.newaxis] >> qrange) & 1
+        bits = np.arange(U.shape[0], dtype=self._dtype_int)
+        bits = (bits[:, np.newaxis] >> qrange) & 1
         bits = np.sum(bits << qargs, axis=1)
 
         basis_out = basis & ~np.sum(1 << qargs)
@@ -43,10 +42,10 @@ class SparseStatevector:
         basis_out = basis_out.ravel()
 
         basis, index = np.unique(basis_out, return_inverse=True)
-        alpha = np.zeros(basis.shape, dtype=alpha.dtype)
+        alpha = np.zeros(basis.shape, dtype=self._dtype_complex)
         np.add.at(alpha, index, alpha_out)
 
-        mask = np.abs(alpha) > 0.
+        mask = np.abs(alpha) > eps
         alpha = alpha[mask]
         basis = basis[mask]
 
@@ -66,8 +65,8 @@ class SparseStatevector:
 
         if 0. < p_frac < 1.:
             probs = probs[index]
-            p_fracs = np.cumsum(probs) / np.sum(probs)
-            n = np.searchsorted(p_fracs, p_frac) + 1
+            probs = np.cumsum(probs) / np.sum(probs)
+            n = np.searchsorted(probs, p_frac) + 1
             index = index[:n]
 
         if 0 < n_max < len(index):

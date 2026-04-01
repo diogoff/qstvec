@@ -8,7 +8,7 @@ from qiskit import QuantumCircuit
 from qiskit.converters import circuit_to_dag
 from qiskit.quantum_info import ScalarOp
 
-from qssvec import SparseStatevector
+from qssvec_gpu import SparseStatevector
 
 # -----------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ for k, block in enumerate(blocks, start=1):
             U = U.compose(node.op, qargs=qargs_idx)
 
         sv.evolve(U.data, qargs)
-        sv.truncate(p_frac=0.95)
+        sv.truncate(p_frac=0.99)
         b_str, prob = sv.bit_string(return_prob=True)
 
         t1 = time.perf_counter()
