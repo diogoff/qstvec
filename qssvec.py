@@ -19,7 +19,7 @@ class SparseStatevector:
             out[key] = a
         return out
 
-    def evolve(self, U, qargs, eps=1e-15):
+    def evolve(self, U, qargs):
         alpha = self.alpha
         basis = self.basis
 
@@ -45,7 +45,7 @@ class SparseStatevector:
         alpha = np.zeros(basis.shape, dtype=self._dtype_complex)
         np.add.at(alpha, index, alpha_out)
 
-        mask = np.abs(alpha) > eps
+        mask = np.abs(alpha) > 0.
         alpha = alpha[mask]
         basis = basis[mask]
 

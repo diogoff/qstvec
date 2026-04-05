@@ -7,8 +7,9 @@ import psutil
 from qiskit import QuantumCircuit
 from qiskit.converters import circuit_to_dag
 from qiskit.quantum_info import ScalarOp
+from qiskit.transpiler.passes import RemoveBarriers
 
-from qssvec_gpu import SparseStatevector
+from qssvec import SparseStatevector
 
 # -----------------------------------------------------------------------------
 
@@ -17,6 +18,8 @@ if len(sys.argv) < 2:
     exit()
 
 qc = QuantumCircuit.from_qasm_file(sys.argv[1])
+qc = RemoveBarriers()(qc)
+qc.remove_final_measurements()
 
 max_qubits = max([len(ci.qubits) for ci in qc.data])
 
@@ -79,7 +82,7 @@ for k, block in enumerate(blocks, start=1):
             U = U.compose(node.op, qargs=qargs_idx)
 
         sv.evolve(U.data, qargs)
-        sv.truncate(p_frac=0.99)
+        sv.truncate(n_max=int(2**25))
         b_str, prob = sv.bit_string(return_prob=True)
 
         t1 = time.perf_counter()
