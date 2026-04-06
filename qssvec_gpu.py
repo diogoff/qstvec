@@ -19,7 +19,7 @@ class SparseStatevector:
         basis = self.basis.get()
         return {f'{b:0{n}b}': a for a, b in zip(alpha, basis)}
 
-    def evolve(self, U, qargs, eps=1e-15):
+    def evolve(self, U, qargs):
         alpha = self.alpha
         basis = self.basis
 
@@ -51,7 +51,7 @@ class SparseStatevector:
 
         alpha = alpha_real + 1.j * alpha_imag
 
-        mask = cp.abs(alpha) > eps
+        mask = cp.abs(alpha) > 0.
         alpha = alpha[mask]
         basis = basis[mask]
 
