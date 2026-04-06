@@ -14,11 +14,10 @@ class SparseStatevector:
         return len(self.basis)
 
     def to_dict(self):
-        out = dict()
-        for b, a in zip(self.basis.get(), self.alpha.get()):
-            key = f'{b:0{self.n_qubits}b}'
-            out[key] = a
-        return out
+        n = self.n_qubits
+        alpha = self.alpha.get()
+        basis = self.basis.get()
+        return {f'{b:0{n}b}': a for a, b in zip(alpha, basis)}
 
     def evolve(self, U, qargs, eps=1e-15):
         alpha = self.alpha
@@ -91,7 +90,8 @@ class SparseStatevector:
     def bit_string(self, return_prob=False):
         probs = cp.abs(self.alpha) ** 2
         i = cp.argmax(probs).item()
-        out = f'{self.basis[i].item():0{self.n_qubits}b}'
+        b = self.basis[i].item()
+        n = self.n_qubits
         if return_prob:
-            return out, probs[i].item()
-        return out
+            return f'{b:0{n}b}', probs[i]
+        return f'{b:0{n}b}'
