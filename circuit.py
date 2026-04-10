@@ -70,9 +70,11 @@ sv = SparseStatevector(qc.num_qubits)
 
 count_nodes = 0
 
+t0 = time.perf_counter()
+
 for k, block in enumerate(blocks, start=1):
     try:
-        t0 = time.perf_counter()
+        t1 = time.perf_counter()
 
         qargs = sorted(set([qc.find_bit(q).index for node in block for q in node.qargs]))
         U = ScalarOp(2 ** len(qargs), coeff=1.+0.j)
@@ -82,10 +84,9 @@ for k, block in enumerate(blocks, start=1):
             U = U.compose(node.op, qargs=qargs_idx)
 
         sv.evolve(U.data, qargs)
-        sv.truncate(n_max=int(2**25))
+#        sv.truncate(n_max=int(2**12))
+        sv.truncate(p_frac=0.99)
         b_str, prob = sv.bit_string(return_prob=True)
-
-        t1 = time.perf_counter()
 
         print()
 
@@ -103,13 +104,16 @@ for k, block in enumerate(blocks, start=1):
         mem = psutil.Process(os.getpid()).memory_info().vms / 1024**3
         print(f'{len(sv):,} terms | order 2^{log} | {mem:.1f} GB')
 
+        t2 = time.perf_counter()
+
+        print(f'elapsed {t2-t0:.1f} s | average {t2-t1:.1f} s/it | ', end='')
         eta = (t1 - t0) * (len(blocks) - k)
         if eta >= 3600:
-            print(f'{t1-t0:.1f} s/it | {eta/3600:.1f} hours')
+            print(f'remaining {eta/3600:.1f} h')
         elif eta >= 60:
-            print(f'{t1-t0:.1f} s/it | {eta/60:.1f} minutes')
+            print(f'remaining {eta/60:.1f} m')
         else:
-            print(f'{t1-t0:.1f} s/it | {eta:.1f} seconds')
+            print(f'remaining {eta:.1f} s')
 
     except KeyboardInterrupt:
         break

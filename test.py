@@ -2,6 +2,7 @@ from qiskit import QuantumCircuit
 from qiskit.quantum_info import Statevector, Operator
 
 from qssvec import SparseStatevector
+#from qssvec_gpu import SparseStatevector
 
 qc = QuantumCircuit.from_qasm_file('test.qasm')
 qc_size = qc.size()
