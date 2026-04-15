@@ -13,11 +13,15 @@ from qssvec import SparseStatevector
 
 # -----------------------------------------------------------------------------
 
-if len(sys.argv) < 2:
-    print(f'Usage: python {sys.argv[0]} file.qasm')
+if len(sys.argv) < 4:
+    print(f'Usage: python {sys.argv[0]} file.qasm p_frac n_max')
     exit()
 
-qc = QuantumCircuit.from_qasm_file(sys.argv[1])
+fname = sys.argv[1]
+p_frac = float(eval(sys.argv[2]))
+n_max = int(eval(sys.argv[3]))
+
+qc = QuantumCircuit.from_qasm_file(fname)
 qc = RemoveBarriers()(qc)
 qc.remove_final_measurements()
 
@@ -84,8 +88,7 @@ for k, block in enumerate(blocks, start=1):
             U = U.compose(node.op, qargs=qargs_idx)
 
         sv.evolve(U.data, qargs)
-#        sv.truncate(n_max=int(2**12))
-        sv.truncate(p_frac=0.99)
+        sv.truncate(p_frac=p_frac, n_max=n_max)
         b_str, prob = sv.bit_string(return_prob=True)
 
         print()
