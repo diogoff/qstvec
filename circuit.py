@@ -9,7 +9,7 @@ from qiskit.converters import circuit_to_dag
 from qiskit.quantum_info import ScalarOp
 from qiskit.transpiler.passes import RemoveBarriers
 
-from qssvec import SparseStatevector
+from qssvec_gpu import SparseStatevector
 
 # -----------------------------------------------------------------------------
 
