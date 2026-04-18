@@ -60,7 +60,8 @@ function Get-PowFromString {
 foreach ($param in $params) {
     $p_frac = $param.p_frac
     $n_max = [int](Get-PowFromString $param.n_max)
-    $out_file = "out_gpu/out_$($p_frac)_$($n_max).txt"
+    $out_file = "out/out_$($p_frac)_$($n_max).txt"
+#    $out_file = "out_gpu/out_$($p_frac)_$($n_max).txt"
     
     $cmd = "python $script $qasm_file $p_frac $n_max *> $out_file"
     Write-Host $cmd
