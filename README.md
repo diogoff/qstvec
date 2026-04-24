@@ -1,2 +1,5 @@
-# qssvec
-A sparse (and possibly truncated) state vector representation based on qiskit.
+# qstsv
+
+**qstsv** stands for **q**uantum **s**parse **t**runcated **s**tate **v**ectors.
+
+
