@@ -40,4 +40,4 @@ This example ensures that the results are fully consistent with a state vector s
 
 For this purpose, `test_gates.qasm` contains an example for all the standard gates available in OpenQASM 2.0 ([qelib1.inc](https://github.com/Qiskit/qiskit/blob/main/qiskit/qasm/libs/qelib1.inc)).
 
-The script `test_gates.py` evolves qiskit's `Statevector` and qstvec's `Statevector` side-by-side,
+The script `test_gates.py` evolves qiskit's `Statevector` and qstvec's `Statevector` side-by-side, and checks that the bit strings and probabilities match after each circuit instruction.
