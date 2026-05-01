@@ -36,6 +36,14 @@ For this purpose, `test_gates.qasm` contains an example with all the standard ga
 
 The script `test_gates.py` evolves qiskit's `Statevector` and qstvec's `Statevector` side-by-side, and checks that the bit strings and probabilities match after each circuit instruction.
 
+## How to use
+
+Download `qstvec.py` and use it together with your code. The only requirement is [NumPy](https://github.com/numpy/numpy).
+
+If you have a GPU and [CuPy](https://github.com/cupy/cupy) installed, you can try using `qstvec_gpu.py` instead. It should be faster, although more memory-limited.
+
+Instantiate the `Statevector` class and evolve the state vector instruction-by-instruction (or block-by-block), truncating it at each step.
+
 ## How to cite
 
 If you find this code useful, please cite the paper:
