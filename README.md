@@ -40,7 +40,7 @@ The script `test_gates.py` evolves qiskit's `Statevector` and qstvec's `Statevec
 
 Download `qstvec.py` and use it together with your code. The only requirement is [NumPy](https://github.com/numpy/numpy).
 
-If you have a GPU and [CuPy](https://github.com/cupy/cupy) installed, you can try using `qstvec_gpu.py` instead. It should be faster, although more memory-limited.
+If you have a GPU and [CuPy](https://github.com/cupy/cupy) installed, you can use `qstvec_gpu.py` instead. It should be faster, although more memory-limited.
 
 Instantiate the `Statevector` class and evolve the state vector instruction-by-instruction (or block-by-block), truncating it at each step.
 
