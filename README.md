@@ -6,7 +6,7 @@ It was originally developed for peaked circuits, where the goal is to find the m
 
 ## Examples
 
-In these examples, we use some circuits from BlueQubit's [Peaked Portal](https://app.bluequbit.io/hackathons) hackathon.
+In these examples, we use some circuits from BlueQubit's [*Peaked Portal*](https://app.bluequbit.io/hackathons) hackathon.
 
 ### Little peak
 
