@@ -4,9 +4,15 @@
 
 ## Examples
 
-In these examples, we use some sample circuits from BlueQubit's [*Peaked Portal*](https://app.bluequbit.io/hackathons) hackathon.
+In these examples, we use some circuits from BlueQubit's [*Peaked Portal*](https://app.bluequbit.io/hackathons) hackathon.
 
 ### Little peak
+
+In this example, `little_peak.qasm` corresponds to BlueQubit's `P1_little_peak.qasm` circuit.
+
+The script `little_peak.py` illustrates how to read the circuit and evolve the state vector, instruction by instruction, without any truncation.
+
+At the end, it prints the most probable bit string.
 
 ### Sharp peak
 
