@@ -34,5 +34,10 @@ For example:
 * use `python sharp_peak.py 0 0.99` for a simulation with a fraction of the probability mass (99%).
 * use `python sharp_peak.py 2**18 1.0` for a simulation with a limit on the number of terms (2<sup>18</sup>).
 
-
 ### Test gates
+
+This example ensures that the results are fully consistent with a state vector simulation via [qiskit](https://github.com/Qiskit/qiskit).
+
+For this purpose, `test_gates.qasm` contains an example for all the standard gates available in OpenQASM 2.0 ([qelib1.inc](https://github.com/Qiskit/qiskit/blob/main/qiskit/qasm/libs/qelib1.inc)).
+
+The script `test_gates.py` evolves qiskit's `Statevector` and qstvec's `Statevector` side-by-side,
