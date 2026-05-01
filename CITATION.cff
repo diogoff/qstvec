@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite the following paper."
-title: "A Sparse and Truncated State Vector Simulator for Peaked Circuits"
+title: "A sparse and truncated state vector simulator for quantum circuits"
 type: software
 authors:
   - given-names: "Diogo R."

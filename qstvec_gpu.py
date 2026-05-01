@@ -1,6 +1,6 @@
 import cupy as cp
 
-class SparseStatevector:
+class Statevector:
     _dtype_complex = cp.complex128
     _dtype_float = cp.float64
     _dtype_int = cp.int64
@@ -59,9 +59,9 @@ class SparseStatevector:
         self.basis = basis
         return self
 
-    def truncate(self, p_frac=1., n_max=0):
+    def truncate(self, k_top=0, p_frac=1.):
+        assert k_top >= 0
         assert 0. <= p_frac <= 1.
-        assert n_max >= 0
 
         alpha = self.alpha
         basis = self.basis
@@ -72,11 +72,11 @@ class SparseStatevector:
         if 0. < p_frac < 1.:
             probs = probs[index]
             probs = cp.cumsum(probs) / cp.sum(probs)
-            n = cp.searchsorted(probs, p_frac) + 1
-            index = index[:n]
+            k = cp.searchsorted(probs, p_frac) + 1
+            index = index[:k]
 
-        if 0 < n_max < len(index):
-            index = index[:n_max]
+        if 0 < k_top < len(index):
+            index = index[:k_top]
 
         if 0 < len(index) < len(basis):
             basis = basis[index]
