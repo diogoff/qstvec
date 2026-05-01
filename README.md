@@ -1,6 +1,8 @@
 # qstvec
 
-**qstvec** is a Python code for approximate simulation of quantum circuits based on a sparse and truncated state vector representation. It was originally developed for peaked circuits, where the goal is to find the most probable bit string.
+**qstvec** is a Python code for approximate simulation of quantum circuits based on a sparse and truncated state vector representation.
+
+It was originally developed for peaked circuits, where the goal is to find the most probable bit string.
 
 ## Examples
 
