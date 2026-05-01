@@ -12,7 +12,7 @@ In these examples, we use some circuits from BlueQubit's [*Peaked Portal*](https
 
 In this example, `little_peak.qasm` corresponds to BlueQubit's `P1_little_peak.qasm` circuit.
 
-The script `little_peak.py` illustrates how to read the circuit and evolve the state vector, instruction by instruction, without any truncation.
+The Python script `little_peak.py` illustrates how to read the circuit and evolve the state vector, instruction by instruction, without any truncation.
 
 At the end, it prints the most probable bit string.
 
@@ -20,7 +20,7 @@ At the end, it prints the most probable bit string.
 
 In this example, `sharp_peak.qasm` corresponds to BlueQubit's `P3_sharp_peak.qasm` circuit.
 
-The script `little_peak.py` implements the circuit simulation strategy (block-based) described in the paper (below).
+The Python script `little_peak.py` implements the circuit simulation strategy (block-based) described in the paper (below).
 
 To use this script, specify the *k* for top-*k* truncation (default 0, no truncation) and/or the $p$ for $p$-mass truncation (default 1.0, no truncation).
 
@@ -34,7 +34,7 @@ This example ensures that the results are fully consistent with a state vector s
 
 For this purpose, `test_gates.qasm` contains an example with all the standard gates available in OpenQASM 2.0 ([qelib1.inc](https://github.com/Qiskit/qiskit/blob/main/qiskit/qasm/libs/qelib1.inc)).
 
-The script `test_gates.py` evolves qiskit's `Statevector` and qstvec's `Statevector` side-by-side, and checks that the bit strings and probabilities match after each circuit instruction.
+The Python script `test_gates.py` evolves qiskit's `Statevector` and qstvec's `Statevector` side-by-side, and checks that the bit strings and probabilities match after each circuit instruction.
 
 ## How to use
 
