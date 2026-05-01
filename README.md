@@ -31,8 +31,8 @@ The script `little_peak.py` implements the circuit simulation strategy (using bl
 To use this script, specify the *k* for top-*k* truncation (default 0, no truncation) and/or the $p$ for $p$-mass truncation (default 1.0, no truncation).
 
 For example:
-* use `python sharp_peak.py 0 0.99` for a simulation with 99% of the probability mass;
-* use `python sharp_peak.py 2**18 1.0` for a simulation with a maximum number of 2^18 terms.
+* use `python sharp_peak.py 0 0.99` for a simulation with a fraction of the probability mass (99%).
+* use `python sharp_peak.py 2**18 1.0` for a simulation with a limit on the number of terms (2<sup>18</sup>).
 
 
 ### Test gates
