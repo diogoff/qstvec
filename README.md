@@ -25,8 +25,8 @@ The Python script `sharp_peak.py` implements the circuit simulation strategy des
 To use this script, specify the *k* for top-*k* truncation (default 0, no truncation) and/or the $p$ for $p$-mass truncation (default 1.0, no truncation).
 
 For example:
-* use `python sharp_peak.py 0 0.99` for a simulation with a fraction of the probability mass (99%).
-* use `python sharp_peak.py 2**18 1.0` for a simulation with a limit on the number of terms (2<sup>18</sup>).
+* use `python sharp_peak.py 0 0.99` for a simulation with a 99% fraction of the probability mass.
+* use `python sharp_peak.py 2**18 1.0` for a simulation with a 2<sup>18</sup> limit on the number of terms.
 
 ### Test gates
 
