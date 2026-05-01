@@ -42,7 +42,7 @@ Download `qstvec.py` and use it together with your code. The only requirement is
 
 If you have a GPU and [CuPy](https://github.com/cupy/cupy) installed, you can try using `qstvec_gpu.py` instead. It should be faster, although more memory-limited.
 
-In any case, instantiate the `Statevector` class and evolve the state vector instruction-by-instruction (as in the little peak example) or block-by-block (as in the sharp peak example), truncating it at each step.
+In any case, instantiate the `Statevector` class and evolve the state vector instruction-by-instruction (as in the *little peak* example) or block-by-block (as in the *sharp peak* example), truncating the state vector at each step.
 
 ## How to cite
 
