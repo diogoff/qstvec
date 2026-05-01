@@ -4,6 +4,8 @@
 
 ## Examples
 
+In these examples, we use some circuits from BlueQubit's [Peaked Portal](https://app.bluequbit.io/hackathons) hackathon.
+
 ### Little peak
 
 ### Sharp peak
