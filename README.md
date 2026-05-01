@@ -20,7 +20,7 @@ At the end, it prints the most probable bit string.
 
 In this example, `sharp_peak.qasm` corresponds to BlueQubit's `P3_sharp_peak.qasm` circuit.
 
-The script `little_peak.py` implements the block-based circuit simulation strategy described in the paper (below).
+The script `little_peak.py` implements the circuit simulation strategy (block-based) described in the paper (see below).
 
 To use this script, specify the *k* for top-*k* truncation (default 0, no truncation) and/or the $p$ for $p$-mass truncation (default 1.0, no truncation).
 
