@@ -10,7 +10,7 @@ In these examples, we use some circuits from BlueQubit's [*Peaked Portal*](https
 
 ### Little peak
 
-In this example, `little_peak.qasm` corresponds to BlueQubit's `P1_little_peak.qasm` circuit.
+The circuit `little_peak.qasm` corresponds to BlueQubit's *Problem 1: Little Peak*.
 
 The Python script `little_peak.py` illustrates how to read the circuit and evolve the state vector, instruction by instruction, without any truncation.
 
@@ -18,19 +18,19 @@ At the end, it prints the most probable bit string.
 
 ### Sharp peak
 
-In this example, `sharp_peak.qasm` corresponds to BlueQubit's `P3_sharp_peak.qasm` circuit.
+The circuit `sharp_peak.qasm` corresponds to BlueQubit's *Problem 3: Sharp Peak*.
 
-The Python script `sharp_peak.py` implements the circuit simulation strategy described in the paper. (Basically, it is a block-based simulation strategy where the gates in one block are composed into a single unitary, and the state vector is evolved block-by-block rather than instruction-by-instruction.)
+The Python script `sharp_peak.py` implements the circuit simulation strategy described in the paper [1]. (Basically, it is a block-based simulation strategy where the gates in a block are composed into a single unitary, and the state vector is evolved block-by-block rather than instruction-by-instruction.)
 
-To use this script, specify the *k* for top-*k* truncation (default 0, no truncation) and/or the $p$ for $p$-mass truncation (default 1.0, no truncation).
+To use this script, specify the *k* for top-*k* truncation and/or the $p$ for $p$-mass truncation. (The default values *k*=0 and *p*=1.0 mean no truncation.)
 
 For example:
-* use `python sharp_peak.py 0 0.99` for a simulation with a 99% fraction of the probability mass.
-* use `python sharp_peak.py 2**18 1.0` for a simulation with a 2<sup>18</sup> limit on the number of terms.
+* `python sharp_peak.py 0 0.99` runs a simulation with a 99% fraction of the probability mass.
+* `python sharp_peak.py 2**18 1.0` runs a simulation with a 2<sup>18</sup> limit on the number of terms.
 
 ### Test gates
 
-This example ensures that the results are fully consistent with a state vector simulation via [qiskit](https://github.com/Qiskit/qiskit).
+This example ensures that the results are fully consistent with a state vector simulation based on [qiskit](https://github.com/Qiskit/qiskit).
 
 For this purpose, `test_gates.qasm` contains an example with all the standard gates available in OpenQASM 2.0 ([qelib1.inc](https://github.com/Qiskit/qiskit/blob/main/qiskit/qasm/libs/qelib1.inc)).
 
@@ -40,7 +40,7 @@ The Python script `test_gates.py` evolves qiskit's `Statevector` and qstvec's `S
 
 Download `qstvec.py` and use it together with your code. The only requirement is [NumPy](https://github.com/numpy/numpy).
 
-If you have a GPU and [CuPy](https://github.com/cupy/cupy) installed, you can try using `qstvec_gpu.py` instead. It should be faster, although more memory-limited.
+If you have a GPU and [CuPy](https://github.com/cupy/cupy) installed, you can try using `qstvec_gpu.py` instead. It should be faster, although more limited in terms of memory.
 
 Instantiate the `Statevector` class and evolve the state vector instruction-by-instruction (as in the "little peak" example) or block-by-block (as in the "sharp peak" example), truncating the state vector at each step.
 
@@ -48,4 +48,4 @@ Instantiate the `Statevector` class and evolve the state vector instruction-by-i
 
 If you find this code useful, please cite the paper:
 
-* Diogo R. Ferreira, *A Sparse and Truncated State Vector Simulator for Peaked Circuits*, 7th IEEE International Conference on Quantum Computing and Engineering (QCE26), 2026.
+[1] Diogo R. Ferreira, *A Sparse and Truncated State Vector Simulator for Peaked Circuits*, 7th IEEE International Conference on Quantum Computing and Engineering (QCE26), 2026.
