@@ -2,7 +2,7 @@
 
 **qstvec** is a Python code for approximate simulation of quantum circuits based on a sparse and truncated state vector representation.
 
-It was originally developed for peaked circuits, where the goal is to find the most probable bit string.
+It was originally developed for peaked circuits, where the goal is to find the most probable output bit string.
 
 ## Examples
 
@@ -42,7 +42,7 @@ Download `qstvec.py` and use it together with your code. The only requirement is
 
 If you have a GPU and [CuPy](https://github.com/cupy/cupy) installed, you can try using `qstvec_gpu.py` instead. It should be faster, although more limited in terms of memory.
 
-Instantiate the `Statevector` class and evolve the state vector instruction-by-instruction (or block-by-block), truncating the state vector at each step.
+In any case, instantiate the `Statevector` class and evolve the state vector instruction-by-instruction (or block-by-block), truncating the state vector at each step.
 
 ## How to cite
 
