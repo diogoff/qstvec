@@ -2,7 +2,9 @@
 
 **qstvec** is a Python package for approximate simulation of quantum circuits based on a sparse and truncated state vector representation.
 
-It was originally developed for peaked circuits, where the goal is to find the most probable output bit string. When only a small fraction of basis states carry most of the probability mass and full 2<sup>n</sup> statevector simulation is wasteful, **qstvec** can simulate larger circuits by storing only the most relevant amplitudes.
+It was originally developed for peaked circuits, where the goal is to find the most probable output bit string.
+
+When only a small fraction of basis states carry most of the probability mass and full 2<sup>n</sup> statevector simulation is impractical, **qstvec** can simulate larger circuits by storing only the most relevant amplitudes.
 
 ## Installation
 
@@ -43,9 +45,9 @@ from qstvec_gpu import Statevector
 
 ## Examples
 
-In these examples, we use some circuits from BlueQubit's [*Peaked Portal*](https://app.bluequbit.io/hackathons) hackathon.
+In the examples, we use some circuits from BlueQubit's [*Peaked Portal*](https://app.bluequbit.io/hackathons) hackathon.
 
-All example scripts live in the `examples/` directory and assume that `qstvec` has been installed (for example with `pip install qstvec` or `pip install -e .` from the repo root).
+All example scripts live in the `examples/` directory and assume that `qstvec` has been installed.
 
 ### Little peak
 
@@ -78,6 +80,6 @@ The Python script `examples/test_gates.py` evolves a Qiskit `Statevector` and a 
 
 ## How to cite
 
-If you find this code useful, please cite the paper:
+If you find this package useful, please cite the paper:
 
 [1] Diogo R. Ferreira, *A Sparse and Truncated State Vector Simulator for Peaked Circuits*, 7th IEEE International Conference on Quantum Computing and Engineering (QCE26), 2026.
