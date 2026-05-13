@@ -58,9 +58,9 @@ At the end, it prints the most probable bit string.
 
 The circuit `examples/sharp_peak.qasm` corresponds to BlueQubit's *Problem 3: Sharp Peak*.
 
-The Python script `examples/sharp_peak.py` implements the circuit simulation strategy described in the paper [1]. Basically, it is a block-based simulation strategy where the gates in a block are composed into a single unitary, and the state vector is evolved block-by-block rather than instruction-by-instruction.
+The Python script `examples/sharp_peak.py` implements the circuit simulation strategy described in the paper [1]. (Basically, it is a block-based simulation strategy where the gates in a block are composed into a single unitary, and the state vector is evolved block-by-block rather than instruction-by-instruction.)
 
-To use this script, specify the *k* for top-*k* truncation and/or the *p* for *p*-mass truncation. (The default values *k* = 0 and *p* = 1.0 mean no truncation.)
+To use this script, specify the *k* for top-*k* truncation and/or the *p* for *p*-mass truncation. (The default values *k*=0 and *p*=1.0 mean no truncation.)
 
 For example:
 
