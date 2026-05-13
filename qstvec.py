@@ -52,8 +52,8 @@ class Statevector:
         self.basis = basis
         return self
 
-    def truncate(self, k_top=0, p_frac=1.):
-        assert k_top >= 0
+    def truncate(self, top_k=0, p_frac=1.):
+        assert top_k >= 0
         assert 0. <= p_frac <= 1.
 
         alpha = self.alpha
@@ -68,8 +68,8 @@ class Statevector:
             k = np.searchsorted(probs, p_frac) + 1
             index = index[:k]
 
-        if 0 < k_top < len(index):
-            index = index[:k_top]
+        if 0 < top_k < len(index):
+            index = index[:top_k]
 
         if 0 < len(index) < len(basis):
             basis = basis[index]
