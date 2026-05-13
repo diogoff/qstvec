@@ -1,25 +1,20 @@
 # qstvec
 
-**qstvec** is a Python code for approximate simulation of quantum circuits based on a sparse and truncated state vector representation.
+**qstvec** is a Python package for approximate simulation of quantum circuits based on a sparse and truncated state vector representation.
 
-It was originally developed for peaked circuits, where the goal is to find the most probable output bit string.
+It was originally developed for peaked circuits, where the goal is to find the most probable output bit string. When only a small fraction of basis states carry most of the probability mass and full 2<sup>n</sup> statevector simulation is wasteful, **qstvec** can simulate larger circuits by storing only the most relevant amplitudes.
 
-## Installation (development)
+## Installation
 
-Clone the repository and install it in editable mode:
-
-```bash
-git clone https://github.com/diogoff/qstvec/
-cd qstvec
-pip install -e .
+```
+pip install qstvec
 ```
 
-This makes `qstvec` importable from any script in your environment while you work on the code.
+This installs qstvec together with its dependencies. After installation, `from qstvec import Statevector` should work in any Python environment.
 
 Requirements:
-
-- [NumPy](https://github.com/numpy/numpy) (installed automatically if declared as a dependency later, or install manually for now)
-- [CuPy](https://github.com/cupy/cupy) is optional and only needed if you want to use the GPU backend.
+* NumPy and Qiskit are installed automatically when you `pip install qstvec`.
+* CuPy is optional and only needed if you want to use the GPU backend.
 
 ## Basic usage
 
@@ -28,23 +23,29 @@ After installation, you can import `Statevector` from the package:
 ```python
 from qstvec import Statevector
 
-sv = Statevector(n_qubits=10)
-# evolve sv instruction-by-instruction or block-by-block, with optional truncation
+sv = Statevector(n_qubits=1) 
+
+U = [[0, 1], [1, 0]]
+qargs = [0]
+
+sv.evolve(U, qargs)
+
+sv.truncate(0, 1.)
+
+print(sv.bit_string())  # prints the most probable bit string
 ```
 
-If you have a GPU and CuPy installed and want to experiment with the GPU backend (API still evolving), you can import from the GPU package:
+If you have a GPU and CuPy installed and want to experiment with the GPU backend, you can import from the GPU package:
 
 ```python
 from qstvec_gpu import Statevector
 ```
 
-In both cases, you instantiate the `Statevector` class and evolve the state vector instruction-by-instruction (or block-by-block), truncating the state vector at each step.
-
 ## Examples
 
 In these examples, we use some circuits from BlueQubit's [*Peaked Portal*](https://app.bluequbit.io/hackathons) hackathon.
 
-All example scripts live in the `examples/` directory and assume that `qstvec` has been installed (for example with `pip install -e .`).
+All example scripts live in the `examples/` directory and assume that `qstvec` has been installed (for example with `pip install qstvec` or `pip install -e .` from the repo root).
 
 ### Little peak
 
@@ -60,7 +61,7 @@ The circuit `examples/sharp_peak.qasm` corresponds to BlueQubit's *Problem 3: Sh
 
 The Python script `examples/sharp_peak.py` implements the circuit simulation strategy described in the paper [1]. (Basically, it is a block-based simulation strategy where the gates in a block are composed into a single unitary, and the state vector is evolved block-by-block rather than instruction-by-instruction.)
 
-To use this script, specify the *k* for top-*k* truncation and/or the *p* for *p*-mass truncation. (The default values *k*=0 and *p*=1.0 mean no truncation.)
+To use this script, specify the *k* for top-*k* truncation and/or the *p* for *p*-mass truncation (top‑*k* keeps only the *k* largest‑probability basis states; *p*‑mass keeps enough terms to cover a fraction *p* of total probability). The default values *k*=0 and *p*=1.0 mean no truncation.
 
 For example:
 

@@ -7,3 +7,4 @@ name = "qstvec"
 version = "0.1.0"
 description = "A sparse and truncated state vector simulator for quantum circuits"
 readme = "README.md"
+dependencies = ["numpy", "qiskit", "psutil"]
