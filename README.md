@@ -10,7 +10,7 @@ It was originally developed for peaked circuits, where the goal is to find the m
 pip install qstvec
 ```
 
-This installs qstvec together with its dependencies. After installation, `from qstvec import Statevector` should work in any Python environment.
+This installs **qstvec** together with its dependencies. After installation, `from qstvec import Statevector` should work in any Python environment.
 
 Requirements:
 * NumPy and Qiskit are installed automatically when you `pip install qstvec`.
@@ -30,7 +30,7 @@ qargs = [0]
 
 sv.evolve(U, qargs)
 
-sv.truncate(0, 1.)
+sv.truncate(top_k=0, p_frac=1.0)  # no truncation
 
 print(sv.bit_string())  # prints the most probable bit string
 ```
