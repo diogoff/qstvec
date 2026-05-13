@@ -9,7 +9,7 @@ It was originally developed for peaked circuits, where the goal is to find the m
 Clone the repository and install it in editable mode:
 
 ```bash
-git clone https://github.com/DiogoRibeiroFerreira/qstvec.git
+git clone https://github.com/diogoff/qstvec/
 cd qstvec
 pip install -e .
 ```
