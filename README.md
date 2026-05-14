@@ -28,16 +28,23 @@ After installation, you can import `Statevector` from the package:
 ```python
 from qstvec import Statevector
 
-sv = Statevector(n_qubits=2) 
+# state vector for a 2-qubit system, initialized in |00>
+sv = Statevector(n_qubits=2)
 
+# unitary Pauli-X (quantum NOT) gate on a single qubit
 U = [[0, 1], [1, 0]]
-qargs = [0]
 
+# apply the unitary to the least-significant qubit
+qargs = [0]                       
+
+# evolve the state vector
 sv.evolve(U, qargs)
 
-sv.truncate(top_k=0, p_frac=1.0)  # no truncation, actually
+# optionally truncate (no effect in this example)
+sv.truncate(top_k=0, p_frac=1.0)
 
-print(sv.bit_string())  # prints the most probable bit string '01'
+# print the most probable bit string '01'
+print(sv.bit_string())
 ```
 
 If you have a GPU and CuPy installed, you might want to try the GPU backend. (It should be faster, but more limited in terms of memory.) For this purpose, import `Statevector` from the GPU package:
