@@ -4,19 +4,21 @@
 
 It was originally developed for peaked circuits, where the goal is to find the most probable output bit string.
 
-When only a small fraction of basis states carry most of the probability mass and full 2<sup>n</sup> state-vector simulation becomes impractical, **qstvec** can simulate larger circuits by storing only the most relevant amplitudes.
+When only a small fraction of basis states carry most of the probability mass and a full 2<sup>n</sup> state-vector simulation becomes impractical, **qstvec** can simulate larger circuits by storing only the most relevant amplitudes.
 
 ## Installation
+
+To install **qstvec** together with its dependencies:
 
 ```
 pip install qstvec
 ```
 
-This installs **qstvec** together with its dependencies. After installation, `from qstvec import Statevector` should work in any Python environment.
-
 Requirements:
 * NumPy and Qiskit are installed automatically when you `pip install qstvec`.
 * CuPy is optional and only needed if you want to use the GPU backend. (To install CuPy, please refer to the official [instrucions](https://docs.cupy.dev/en/stable/install.html).)
+
+After installation, `from qstvec import Statevector` should work in any Python environment.
 
 ## Basic usage
 
