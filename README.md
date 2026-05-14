@@ -19,11 +19,11 @@ Requirements:
 * CuPy is optional and only needed if you want to use the GPU backend.  
 (To install CuPy, please refer to the official [instructions](https://docs.cupy.dev/en/stable/install.html).)
 
-After installation, you can import `Statevector` from the package.
+After installation, `from qstvec import Statevector` should work in any Python environment.
 
 ## Basic usage
 
-After installation, `from qstvec import Statevector` should work in any Python environment:
+After installation, you can import `Statevector` from the package:
 
 ```python
 from qstvec import Statevector
