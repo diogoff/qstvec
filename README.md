@@ -37,10 +37,10 @@ sv.evolve(U, qargs)
 
 sv.truncate(top_k=0, p_frac=1.0)  # no truncation, actually
 
-print(sv.bit_string())  # print the most probable bit string
+print(sv.bit_string())  # prints the most probable bit string
 ```
 
-If you have a GPU and CuPy installed and want to experiment with the GPU backend, you can import `Statevector` from the GPU package instead:
+If you have a GPU and CuPy installed, you might want to try the GPU backend. (It should be faster, but more limited in terms of memory.) For this purpose, import `Statevector` from the GPU package:
 
 ```python
 from qstvec_gpu import Statevector
