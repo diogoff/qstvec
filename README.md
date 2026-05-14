@@ -16,7 +16,8 @@ pip install qstvec
 
 Requirements:
 * NumPy and Qiskit are installed automatically when you `pip install qstvec`.
-* CuPy is optional and only needed if you want to use the GPU backend. (To install CuPy, please refer to the official [instrucions](https://docs.cupy.dev/en/stable/install.html).)
+* CuPy is optional and only needed if you want to use the GPU backend.  
+(To install CuPy, please refer to the official [instructions](https://docs.cupy.dev/en/stable/install.html).)
 
 After installation, `from qstvec import Statevector` should work in any Python environment.
 
