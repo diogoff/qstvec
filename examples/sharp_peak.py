@@ -15,10 +15,10 @@ from qstvec import Statevector
 # -----------------------------------------------------------------------------
 
 if len(sys.argv) < 3:
-    print(f'Usage: python {sys.argv[0]} k_top p_frac')
+    print(f'Usage: python {sys.argv[0]} top_k p_frac')
     exit()
 
-k_top = int(eval(sys.argv[1]))
+top_k = int(eval(sys.argv[1]))
 p_frac = float(eval(sys.argv[2]))
 
 # -----------------------------------------------------------------------------
@@ -90,7 +90,7 @@ for k, block in enumerate(blocks, start=1):
             U = U.compose(node.op, qargs=qargs_idx)
 
         sv.evolve(U.data, qargs)
-        sv.truncate(k_top, p_frac)
+        sv.truncate(top_k, p_frac)
         b_str, prob = sv.bit_string(return_prob=True)
 
         print()
