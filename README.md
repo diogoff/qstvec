@@ -31,7 +31,7 @@ from qstvec import Statevector
 # state vector for a 2-qubit system, initialized in |00>
 sv = Statevector(n_qubits=2)
 
-# unitary Pauli-X (quantum NOT) gate on a single qubit
+# unitary for Pauli-X (quantum NOT) gate on single qubit
 U = [[0, 1], [1, 0]]
 
 # apply the unitary to the least-significant qubit
@@ -47,7 +47,11 @@ sv.truncate(top_k=0, p_frac=1.0)
 print(sv.bit_string())
 ```
 
-If you have a GPU and CuPy installed, you might want to try the GPU backend. (It should be faster, but more limited in terms of memory.) For this purpose, import `Statevector` from the GPU package:
+### GPU backend
+
+If you have a GPU and CuPy installed, you might want to try the GPU backend. (It should be faster, but more limited in terms of memory.)
+
+For this purpose, import `Statevector` from the GPU package instead:
 
 ```python
 from qstvec_gpu import Statevector
