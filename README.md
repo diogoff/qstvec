@@ -88,7 +88,7 @@ This example shows that the results are consistent with a state vector simulatio
 
 For this purpose, `test_gates.qasm` contains examples of all the standard gates available in OpenQASM 2.0 (as specified in [qelib1.inc](https://github.com/Qiskit/qiskit/blob/main/qiskit/qasm/libs/qelib1.inc)).
 
-The Python script `test_gates.py` evolves a **qiskit**'s `Statevector` and a **qstvec**'s `Statevector` side-by-side, and checks that the bit strings and probabilities agree after each circuit instruction.
+The Python script `test_gates.py` evolves a `qiskit.Statevector` and a `qstvec.Statevector` side-by-side, and checks that the bit strings and probabilities agree after each circuit instruction.
 
 ## How to cite
 
