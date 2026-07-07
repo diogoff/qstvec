@@ -94,4 +94,4 @@ The Python script `test_gates.py` evolves a **qiskit** `Statevector` and a **qst
 
 If you find this package useful, please cite:
 
-[1] Diogo R. Ferreira, *A Sparse and Truncated State Vector Simulator for Peaked Circuits*, 7th IEEE International Conference on Quantum Computing and Engineering (QCE26), 2026
+[1] Diogo R. Ferreira, *A Sparse and Truncated State Vector Simulator for Peaked Circuits*, arxiv:xxxx.xxxxx, 2026
