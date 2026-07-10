@@ -1,6 +1,6 @@
 # qstvec
 
-**qstvec** is a Python package for approximate simulation of quantum circuits based on a sparse and truncated state vector representation.
+**qstvec** is a Python package for approximate simulation of quantum circuits based on a sparse and truncated state-vector representation.
 
 It was originally developed for _peaked circuits_, where the goal is to find the most probable bit string at the output of the circuit.
 
@@ -84,7 +84,7 @@ Examples:
 
 ### Test gates
 
-This example shows that the results are consistent with a state vector simulation based on [Qiskit](https://github.com/Qiskit/qiskit).
+This example shows that the results are consistent with a state-vector simulation based on [Qiskit](https://github.com/Qiskit/qiskit).
 
 For this purpose, `test_gates.qasm` contains examples of all the standard gates available in OpenQASM 2.0 (as specified in [qelib1.inc](https://github.com/Qiskit/qiskit/blob/main/qiskit/qasm/libs/qelib1.inc)).
 
