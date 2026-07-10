@@ -1,8 +1,5 @@
 cff-version: 1.2.0
-message: >
-  If you use qstvec in your research, please cite the associated arXiv
-  preprint below. You may also cite the software directly using this
-  metadata.
+message: If you find this package useful, please cite the paper below.
 
 title: "qstvec: A Sparse and Truncated State Vector Simulator for Peaked Circuits"
 authors:
