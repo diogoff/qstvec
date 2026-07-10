@@ -74,7 +74,7 @@ At the end, it prints the most probable bit string.
 
 The circuit `sharp_peak.qasm` corresponds to BlueQubit's *Problem 3: Sharp Peak*.
 
-The Python script `sharp_peak.py` implements the circuit simulation strategy described in the paper [1]. (Basically, it is a block-based simulation strategy where multiple gates are composed into a single unitary, and the state vector is evolved block-by-block rather than instruction-by-instruction.)
+The Python script `sharp_peak.py` implements the circuit simulation strategy described in the paper (see below). Basically, it is a block-based simulation strategy where multiple gates are composed into a single unitary, and the state vector is evolved block-by-block rather than instruction-by-instruction.
 
 To use this script, specify the *k* for top-*k* truncation and/or the *p* for *p*-mass truncation. (Top‑*k* truncation keeps only the *k* largest‑probability basis states, while *p*‑mass truncation keeps enough terms to cover a fraction *p* of the total probability mass). The default values are *k*=0 and *p*=1.0, which mean no truncation.
 
@@ -94,4 +94,4 @@ The Python script `test_gates.py` evolves a **qiskit** `Statevector` and a **qst
 
 If you find this package useful, please cite:
 
-[1] Diogo R. Ferreira, *Developing a Sparse and Truncated State-Vector Simulator for Quantum Circuits*, 6th International Workshop on Quantum Software Engineering and Technology, 2026 (to appear)
+* Diogo R. Ferreira, *Developing a Sparse and Truncated State-Vector Simulator for Quantum Circuits*, 6th International Workshop on Quantum Software Engineering and Technology, 2026 (to appear)
