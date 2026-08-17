@@ -112,7 +112,7 @@ for k, block in enumerate(blocks, start=1):
         t2 = time.perf_counter()
 
         print(f'elapsed {t2-t0:.1f} s | average {t2-t1:.1f} s/it | ', end='')
-        eta = (t1 - t0) * (len(blocks) - k)
+        eta = (t2 - t1) * (len(blocks) - k)
         if eta >= 3600:
             print(f'remaining {eta/3600:.1f} h')
         elif eta >= 60:
