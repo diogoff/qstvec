@@ -1,4 +1,4 @@
-![qstvec logo](qstvec.jpg)
+![qstvec logo](qstvec-logo.jpg)
 
 # qstvec
 
