@@ -1,5 +1,7 @@
 <img src="qstvec.png" width="50%">
 
+#
+
 **qstvec** is a Python package for approximate simulation of quantum circuits based on a sparse and truncated state-vector representation.
 
 It was originally developed for _peaked circuits_, where the goal is to find the most probable bit string at the output of the circuit.
