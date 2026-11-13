@@ -1,6 +1,6 @@
 <img src="qstvec.png" width="50%">
 
-#
+# qstvec
 
 **qstvec** is a Python package for approximate simulation of quantum circuits based on a sparse and truncated state-vector representation.
 
