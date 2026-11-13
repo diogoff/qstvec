@@ -1,4 +1,4 @@
-![qstvec logo](qstvec.png)
+![qstvec logo](qstvec.png){width=50%}
 
 # qstvec
 
